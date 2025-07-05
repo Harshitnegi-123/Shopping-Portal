@@ -1,0 +1,14 @@
+# Common folders
+node_modules/
+.env
+dist/
+build/
+.vite/
+
+# Backend specific
+Backend/node_modules/
+Backend/.env
+
+# Frontend specific
+Frontend/node_modules/
+Frontend/.env
