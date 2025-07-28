@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Navbar from "../component/Navbar";
 import { useNavigate } from "react-router-dom";
 
 import API from "../api";
@@ -22,12 +23,15 @@ const Login = () => {
     }
 
     return (
+        <>
+        <Navbar/>
         <form onSubmit={handleSubmit} >
             <h2>Login</h2>
             <input type="email" placeholder="Email" name="email" onChange={handleChange} required />
             <input type="password" placeholder="Password" name="password" onChange={handleChange} required />
             <button type="submit">Login</button>
         </form>
+        </>
     )
 }
 export default Login
