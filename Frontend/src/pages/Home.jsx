@@ -1,63 +1,97 @@
-import React from "react";
+import React, { useState } from "react";
 import HeroText from "../component/HeroText";
 import { Link } from "react-router-dom";
+import { span } from "framer-motion/client";
+const categories = [
+    { name: "Fruits", icon: "🍎", link: "/Fruits" },
+    { name: "Vegetables", icon: "🥦", link: "/vegetable" },
+    { name: "Dairy", icon: "🥛", link: "/dairy" },
+    { name: "Bakery", icon: "🍞", link: "/bakery" },
+    { name: "Snacks", icon: "🍪", link: "/snacks" },
+    { name: "Beverages", icon: "🥤", link: "/beverage" },
+];
+const offers = [
+    {
+        title: "20% Off on Fresh Fruits",
+        desc: "Get a healthy start! Limited time offer on all fresh fruits.",
+        color: "bg-yellow-200",
+    },
+    {
+        title: "Buy 1 Get 1 Free: Dairy",
+        desc: "Double the goodness on select dairy products.",
+        color: "bg-yellow-100",
+    },
+    {
+        title: "Free Delivery Over $25",
+        desc: "No delivery charges on orders above $25.",
+        color: "bg-yellow-300",
+    },
+];
+
+const features = [
+    {
+        icon: "🚚",
+        title: "Superfast Delivery",
+        desc: "Groceries delivered to your door in under 30 minutes!",
+    },
+    {
+        icon: "🥗",
+        title: "Freshness Guaranteed",
+        desc: "We source only the freshest produce and products.",
+    },
+    {
+        icon: "💳",
+        title: "Easy Payments",
+        desc: "Multiple payment options for your convenience.",
+    },
+];
+
+const testimonials = [
+    {
+        name: "Priya S.",
+        review: "GrocerEase is a lifesaver! Super quick delivery and everything is always fresh.",
+        avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+    },
+    {
+        name: "Abhinav M.",
+        review: "Great prices, great service. I love the offers and the easy checkout!",
+        avatar: "https://randomuser.me/api/portraits/men/65.jpg",
+    },
+];
+const products = [
+    {
+        id: 1,
+        name: "Fresh Apples",
+        price: 2.99,
+        unit: "kg",
+        image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80",
+        description: "Crisp and juicy apples, perfect for snacking."
+    },
+    {
+        id: 2,
+        name: "Organic Bananas",
+        price: 1.49,
+        unit: "kg",
+        image: "https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=400&q=80",
+        description: "Sweet, organic bananas for your daily nutrition."
+    },
+    {
+        id: 3,
+        name: "Fresh Milk",
+        price: 0.99,
+        unit: "L",
+        image: "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=400&q=80",
+        description: "Locally sourced, farm-fresh milk delivered daily."
+    }
+];
 export default function Home() {
-    const categories = [
-        { name: "Fruits", icon: "🍎" ,link: "/Fruits" },
-        { name: "Vegetables", icon: "🥦",link: "/vegetable" },
-        { name: "Dairy", icon: "🥛" ,link: "/dairy" },
-        { name: "Bakery", icon: "🍞" ,link: "/bakery" },
-        { name: "Snacks", icon: "🍪" ,link: "/snacks" },
-        { name: "Beverages", icon: "🥤" ,link: "/beverage" },
-    ];
-    const offers = [
-        {
-            title: "20% Off on Fresh Fruits",
-            desc: "Get a healthy start! Limited time offer on all fresh fruits.",
-            color: "bg-yellow-200",
-        },
-        {
-            title: "Buy 1 Get 1 Free: Dairy",
-            desc: "Double the goodness on select dairy products.",
-            color: "bg-yellow-100",
-        },
-        {
-            title: "Free Delivery Over $25",
-            desc: "No delivery charges on orders above $25.",
-            color: "bg-yellow-300",
-        },
-    ];
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    const [cartItem, setcartItem] = useState([])
+    
 
-    const features = [
-        {
-            icon: "🚚",
-            title: "Superfast Delivery",
-            desc: "Groceries delivered to your door in under 30 minutes!",
-        },
-        {
-            icon: "🥗",
-            title: "Freshness Guaranteed",
-            desc: "We source only the freshest produce and products.",
-        },
-        {
-            icon: "💳",
-            title: "Easy Payments",
-            desc: "Multiple payment options for your convenience.",
-        },
-    ];
-
-    const testimonials = [
-        {
-            name: "Priya S.",
-            review: "GrocerEase is a lifesaver! Super quick delivery and everything is always fresh.",
-            avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-        },
-        {
-            name: "Abhinav M.",
-            review: "Great prices, great service. I love the offers and the easy checkout!",
-            avatar: "https://randomuser.me/api/portraits/men/65.jpg",
-        },
-    ];
+    const getTotalItem = () => {
+        return cartItem.reduce((total, item) => total + item.quantity, 0)
+    }
     return (
         <div className="max-h-screen flex flex-col">
             {/* Navbar */}
@@ -66,7 +100,7 @@ export default function Home() {
                 <div className=" text-base space-x-6 px-6 text-gray-800 items-center font-medium">
                     <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Home</a>
                     <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Shop</a>
-                    <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
+                    <a href="/cart" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
                 </div>
             </nav>
             {/* Hero text */}
@@ -111,8 +145,8 @@ export default function Home() {
                 <h2 className="font-bold text-2xl justify-center  flex mb-4">Shop by category</h2>
                 <div className="flex flex-wrap gap-6 justify-center">
                     {categories.map((cat) => (
-                        cat.link?(
-                             <Link  
+                        cat.link ? (
+                            <Link
                                 key={cat.name}
                                 to={cat.link}
                                 className="flex flex-col items-center bg-white rounded-xl shadow px-6 py-4 hover:bg-yellow-100 transition"
@@ -122,12 +156,12 @@ export default function Home() {
                                 <span className="font-medium text-gray-700">{cat.name}</span>
                             </Link>
 
-                        ):(
-                            <button  
-                            key={cat.name} className="flex flex-col items-center bg-white py-4 px-6 rounded-xl shadow hover:bg-yellow-100 transition " disabled>
-                            <span className="text-3xl mb-2">{cat.icon}</span>
-                            <span className="font-medium text-gray-600">{cat.name}</span>
-                        </button>
+                        ) : (
+                            <button
+                                key={cat.name} className="flex flex-col items-center bg-white py-4 px-6 rounded-xl shadow hover:bg-yellow-100 transition " disabled>
+                                <span className="text-3xl mb-2">{cat.icon}</span>
+                                <span className="font-medium text-gray-600">{cat.name}</span>
+                            </button>
                         )
                     ))}
                 </div>

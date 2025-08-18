@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import React from "react";
-
+import { Link } from "react-router-dom"; 
 
 export default function Vegetable() {
   const [vegetables, setvegetables] = useState([])
@@ -37,6 +36,7 @@ return (
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Available Vegetables</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {vegetables.map((veg) => (
+          <Link key={veg.name} to={`/product/${(veg.name)}`}>
           <div key={veg.name} className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col">
             <img src={veg.imgurl} alt={veg.name} className="w-full h-48 object-cover" />
             <div className="p-4 flex-1 flex flex-col justify-between">
@@ -50,6 +50,7 @@ return (
               </div>
             </div>
           </div>
+          </Link>
         ))}
       </div>
     </section>

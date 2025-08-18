@@ -55,17 +55,17 @@ Router.get("/search", async (req, res) => {
     }
     try {
         const products = await Product.find({
+            // "$or means Agar inme se koi bhi condition true hai, to match karo."
             $or: [
+                // regex regular expression search (string match) , query url se ara h or string match hori h regex , Ye allow karta hai partial match (jaise "sh" se "shoes" mil jaaye)se , option i mean case insensitive
                 { name: { $regex: query, $options: "i" } },
                 { category: { $regex: query, $options: "i" } }
-            ]
-        })
+            ]        })
         res.status(200).json(products)
     } catch (error) {
         console.log("Search Error:", error.message);
         res.status(500).json({ message: "Server error" });
     }
-
 })
 
 
@@ -119,7 +119,7 @@ Router.get("/category/:category", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
-});
+}); 
 
 // routes/products.js
 Router.get('/name/:name', async (req, res) => {
@@ -131,7 +131,5 @@ Router.get('/name/:name', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
-
 
 module.exports = Router

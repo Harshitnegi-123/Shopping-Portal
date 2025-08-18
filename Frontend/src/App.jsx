@@ -6,13 +6,13 @@ import ProtectedRoute from './component/ProtectedRoute'
 import './App.css'
 import Home from './pages/Home'
 import Fruits from './pages/Fruits'
-import Cart from './pages/cart'
 import Vegetable from './pages/Vegetable'
 import Dairy from './pages/DairyProduct'
 import Bakery from './pages/Bakery'
 import Beverage from './pages/Beverage'
 import Snacks from './pages/Snacks'
 import ProductDetails from './component/ProductDetails'
+import Cart from './pages/cart'
 
 function App() {
 
@@ -29,10 +29,10 @@ function App() {
           <Route path="/bakery" element={<Bakery/>} />
           <Route path="/snacks" element={<Snacks/>} />
           <Route path="/beverage" element={<Beverage/>} />
-          <Route path='/cart' element={<Cart />} />
           <Route path='/product/:name' element={<ProductDetails />} />
-          <Route path='/dashboard' element={<ProtectedRoute><Dashboard /></ProtectedRoute>} /></Routes>
-        {/* <Route path='/cart' element={<Cart/>}/> */}
+          <Route path='/dashboard' element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path='/cart' element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+        </Routes>
       </Router>
     </>
   )
