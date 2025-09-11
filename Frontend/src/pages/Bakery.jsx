@@ -1,55 +1,57 @@
 import React from "react";
-
-const bakeryProducts = [
-    {
-        name: "Bread",
-        image: "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=400&q=80",
-        desc: "Freshly baked bread, soft and delicious.",
-        price: "$2.49/loaf",
-    },
-    {
-        name: "Croissant",
-        image: "https://images.unsplash.com/photo-1465101178521-c1a9136a3b41?auto=format&fit=crop&w=400&q=80",
-        desc: "Buttery, flaky croissants for breakfast.",
-        price: "$1.99/each",
-    },
-    {
-        name: "Muffin",
-        image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80",
-        desc: "Moist, sweet muffins in various flavors.",
-        price: "$2.29/each",
-    },
-    {
-        name: "Bagel",
-        image: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80",
-        desc: "Chewy, golden bagels perfect for any spread.",
-        price: "$1.49/each",
-    },
-    {
-        name: "Cake",
-        image: "https://images.unsplash.com/photo-1574226516831-e1dff420e8e9?auto=format&fit=crop&w=400&q=80",
-        desc: "Delicious cakes for every celebration.",
-        price: "$15.99/cake",
-    },
-    {
-        name: "Donut",
-        image: "https://images.unsplash.com/photo-1506089676908-3592f7389d4d?auto=format&fit=crop&w=400&q=80",
-        desc: "Sweet, glazed donuts in assorted flavors.",
-        price: "$1.29/each",
-    },
-];
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion"
+import { ToastContainer, toast, Bounce } from "react-toastify";
+import { Link } from "react-router-dom";
+import { useState,useEffect } from "react";
+import axios from "axios";
 
 export default function Bakery() {
+
+    const navigate = useNavigate();
+    const [bakeryProducts, setbakeryProducts] = useState([])
+    useEffect(() => {
+        axios.get("http://localhost:5000/api/products/category/bakery")
+            .then(res => setbakeryProducts(res.data))
+            .catch(err => console.error(err))
+    }, [])
+
+    const handleAddToCart = async (productId) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                navigate("/");
+                return;
+            }
+
+            const res = await axios.post(
+                "http://localhost:5000/api/cart/add",
+                { productId, quantity: 1 },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            toast.success("Successfully added")
+            console.log(res.data);
+
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                navigate("/"); // token invalid → login page
+            } else {
+                toast.error("Failed to add to cart ❌")
+                console.error(error);
+            }
+        }
+    };
     return (
         <div className="min-h-screen bg-yellow-50 flex flex-col">
             {/* Navbar */}
             <nav className="bg-yellow-300 px-6 py-4 flex justify-between items-center shadow">
                 <div className="text-2xl font-bold text-gray-800">GrocerEase</div>
                 <div className="flex items-center gap-6 text-base font-medium">
-                    <a href="/" className="text-gray-700 hover:text-yellow-700 transition">Home</a>
+                    <a href="/home" className="text-gray-700 hover:text-yellow-700 transition">Home</a>
                     <a href="#" className="text-orange-700 font-semibold">Bakery</a>
-                    <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Shop</a>
-                    <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
+                    <a href="/cart" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
                 </div>
             </nav>
 
@@ -62,12 +64,18 @@ export default function Bakery() {
             </section>
 
             {/* Bakery Grid */}
-            <section className="max-w-6xl mx-auto w-full p-4 flex-1">
+            <motion.section className="max-w-6xl mx-auto w-full p-4 flex-1"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+            >
                 <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Available Bakery Products</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                     {bakeryProducts.map((item) => (
-                        <div key={item.name} className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col">
-                            <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
+                        <div key={item._id} className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col">
+                            <Link to={`/product/${encodeURIComponent(item.name)}`}>
+                                <img src={item.imgurl} alt={item.name} className="w-full h-48 object-cover" />
+                            </Link>
                             <div className="p-4 flex-1 flex flex-col justify-between">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
@@ -75,18 +83,33 @@ export default function Bakery() {
                                 </div>
                                 <div className="flex justify-between items-center mt-2">
                                     <span className="text-yellow-700 font-bold text-lg">{item.price}</span>
-                                    <button className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add</button>
+
+                                    <button onClick={() => handleAddToCart(item._id)} className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add to cart</button>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
-            </section>
+            </motion.section>
 
             {/* Footer */}
             <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
-                &copy; 2024 GrocerEase. All rights reserved.
+                &copy; 2025 KiranaKart. Made by Harshit Negi.
             </footer>
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick={false}
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+                transition={Bounce}
+                progressClassName="!bg-yellow-400"
+            />
         </div>
     );
 } 

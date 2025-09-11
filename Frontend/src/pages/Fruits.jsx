@@ -1,11 +1,12 @@
-import React from "react";
 import { useState, useEffect } from "react";
+import { motion, stagger } from "framer-motion";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import api from "../api";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer, Bounce } from "react-toastify";
 
 export default function Fruits() {
+
   const navigate = useNavigate();
   const [fruits, setFruits] = useState([])
   useEffect(() => {
@@ -29,16 +30,15 @@ export default function Fruits() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      alert("Item added to cart ✅");
+      toast.success("Successfully added")
       console.log(res.data);
 
     } catch (error) {
       if (error.response && error.response.status === 401) {
         navigate("/"); // token invalid → login page
       } else {
+        toast.error("Failed to add to cart ❌")
         console.error(error);
-        alert("Failed to add to cart ❌");
       }
     }
   };
@@ -50,21 +50,29 @@ export default function Fruits() {
         <div className="flex items-center gap-6 text-base font-medium">
           <a href="/home" className="text-gray-700 hover:text-yellow-700 transition">Home</a>
           <a href="#" className="text-yellow-700 font-semibold">Fruits</a>
-          <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Shop</a>
-          <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
+          <a href="/cart" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
+          <Link to="/orders" className="text-gray-700 hover:text-gray-900">
+            My Orders
+          </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-10 px-4 bg-yellow-50">
+      <motion.section
+        className="flex flex-col items-center justify-center text-center py-10 px-4 bg-yellow-50"
+      >
         <h1 className="text-4xl md:text-5xl font-extrabold text-yellow-800 mb-3">Fresh Fruits</h1>
         <p className="text-lg text-gray-700 mb-4 max-w-xl">
           Explore our wide selection of fresh, juicy, and delicious fruits delivered straight to your door.
         </p>
-      </section>
+      </motion.section>
 
       {/* Fruits Grid */}
-      <section className="max-w-6xl mx-auto w-full p-4 flex-1">
+      <motion.section className="max-w-6xl mx-auto w-full p-4 flex-1"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Available Fruits</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -107,13 +115,27 @@ export default function Fruits() {
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
 
       {/* Footer */}
       <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
-        &copy; 2024 GrocerEase. All rights reserved.
+        &copy; 2025 KiranaKart. Made by Harshit Negi.
       </footer>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+        progressClassName="!bg-yellow-400"
+      />
     </div>
 
   );

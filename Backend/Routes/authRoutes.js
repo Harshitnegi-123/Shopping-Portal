@@ -1,9 +1,10 @@
-const express = require("express")
-const Router = express.Router()
-const bcrypt = require("bcryptjs")
-const jwt = require('jsonwebtoken')
-const User = require('../Models/User')
-const verifyToken = require('../Middleware/authMiddleware')
+import express from "express";
+import bcrypt from "bcryptjs";
+import jwt from 'jsonwebtoken';
+import User from '../Models/User.js';
+import verifyToken from '../Middleware/authMiddleware.js';
+
+const Router = express.Router();
 
 Router.post('/signup', async (req, res) => {
     const { username, email, password } = req.body;
@@ -56,4 +57,4 @@ Router.get('/dashboard', verifyToken, (req, res) => {
     })
 })
 
-module.exports = Router;
+export default Router;

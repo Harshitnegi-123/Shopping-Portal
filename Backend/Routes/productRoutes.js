@@ -1,7 +1,8 @@
-const express = require("express")
-const Router = express.Router()
-const Product = require('../Models/Product')
-const verifytoken = require('../Middleware/authMiddleware')
+import express from "express";
+import Product from '../Models/Product.js';
+import verifytoken from '../Middleware/authMiddleware.js';
+
+const Router = express.Router();
 
 Router.post("/add", verifytoken, async (req, res) => {
     console.log("REQ BODY:", req.body);
@@ -21,7 +22,6 @@ Router.post("/add", verifytoken, async (req, res) => {
         return res.status(500).json({ message: "Server error" })
     }
 })
-
 
 Router.get("/", async (req, res) => {
     try {
@@ -60,14 +60,14 @@ Router.get("/search", async (req, res) => {
                 // regex regular expression search (string match) , query url se ara h or string match hori h regex , Ye allow karta hai partial match (jaise "sh" se "shoes" mil jaaye)se , option i mean case insensitive
                 { name: { $regex: query, $options: "i" } },
                 { category: { $regex: query, $options: "i" } }
-            ]        })
+            ]
+        })
         res.status(200).json(products)
     } catch (error) {
         console.log("Search Error:", error.message);
         res.status(500).json({ message: "Server error" });
     }
 })
-
 
 Router.get("/:id", async (req, res) => {
     const { id } = req.params
@@ -105,31 +105,23 @@ Router.put("/update/:id", verifytoken, async (req, res) => {
 
         res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
     } catch (error) {
-        console.log("Update Product Error:", error);
+        console.log("Update Product Error:", error.message);
         res.status(500).json({ message: "Server error" });
     }
 });
 
-// search
+// GET products by category
 Router.get("/category/:category", async (req, res) => {
-  try {
-    const category = req.params.category;
-    const products = await Product.find({ category: { $regex: new RegExp(category, "i") } });
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-}); 
-
-// routes/products.js
-Router.get('/name/:name', async (req, res) => {
+    const { category } = req.params;
     try {
-        const product = await Product.findOne({ name: req.params.name });
-        if (!product) return res.status(404).json({ message: "Product not found" });
-        res.json(product);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+        const products = await Product.find({
+            category: { $regex: category, $options: "i" }
+        });
+        res.status(200).json(products);
+    } catch (error) {
+        console.log("Fetch Products by Category Error:", error.message);
+        res.status(500).json({ message: "Server error" });
     }
 });
 
-module.exports = Router
+export default Router;

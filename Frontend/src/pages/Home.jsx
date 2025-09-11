@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
+import { motion, stagger } from "framer-motion";
 import HeroText from "../component/HeroText";
+import { div } from "framer-motion/client";
 import { Link } from "react-router-dom";
-import { span } from "framer-motion/client";
+
 const categories = [
     { name: "Fruits", icon: "🍎", link: "/Fruits" },
     { name: "Vegetables", icon: "🥦", link: "/vegetable" },
@@ -10,6 +12,7 @@ const categories = [
     { name: "Snacks", icon: "🍪", link: "/snacks" },
     { name: "Beverages", icon: "🥤", link: "/beverage" },
 ];
+
 const offers = [
     {
         title: "20% Off on Fresh Fruits",
@@ -46,190 +49,255 @@ const features = [
     },
 ];
 
-const testimonials = [
-    {
-        name: "Priya S.",
-        review: "GrocerEase is a lifesaver! Super quick delivery and everything is always fresh.",
-        avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-    },
-    {
-        name: "Abhinav M.",
-        review: "Great prices, great service. I love the offers and the easy checkout!",
-        avatar: "https://randomuser.me/api/portraits/men/65.jpg",
-    },
-];
-const products = [
-    {
-        id: 1,
-        name: "Fresh Apples",
-        price: 2.99,
-        unit: "kg",
-        image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80",
-        description: "Crisp and juicy apples, perfect for snacking."
-    },
-    {
-        id: 2,
-        name: "Organic Bananas",
-        price: 1.49,
-        unit: "kg",
-        image: "https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=400&q=80",
-        description: "Sweet, organic bananas for your daily nutrition."
-    },
-    {
-        id: 3,
-        name: "Fresh Milk",
-        price: 0.99,
-        unit: "L",
-        image: "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=400&q=80",
-        description: "Locally sourced, farm-fresh milk delivered daily."
-    }
-];
 export default function Home() {
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    const [cartItem, setcartItem] = useState([])
-    
 
-    const getTotalItem = () => {
-        return cartItem.reduce((total, item) => total + item.quantity, 0)
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
     }
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: { type: "spring", stiffness: 100 }
+            // spring: ek natural bounce effect deta hai(jaise spring ki tarah slide ho ke aa raha ho).
+
+            //     stiffness: jitna zyada stiffness utna tight/ bouncy motion.
+        }
+    }
+
     return (
-        <div className="max-h-screen flex flex-col">
-            {/* Navbar */}
-            <nav className="bg-yellow-300 flex flex-col sm:flex-row px-35 py-4 items-center justify-between">
-                <div className="text-2xl font-bold tracking-wide text-gray-800 ">Kiranakart</div>
-                <div className=" text-base space-x-6 px-6 text-gray-800 items-center font-medium">
-                    <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Home</a>
-                    <a href="#" className="text-gray-700 hover:text-yellow-700 transition">Shop</a>
-                    <a href="/cart" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
+        <div className="min-h-screen flex flex-col bg-gradient-to-b from-yellow-50 to-white">
+            {/* Navbar will be rendered from App.jsx */}
+            <div className="w-full">
+                {/* Navbar will be rendered from App.jsx */}
+            </div>
+            {/* Hero Section with Animations */}
+            <motion.section
+                className="bg-gradient-to-b from-yellow-50 to bg-yellow-100 py-16 overflow-hidden relative z-10 "
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+
+            >
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center">
+                    <motion.div
+                        className="md:w-1/2 mb-8 md:mb-0"
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                    >
+                        <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                        >
+                            <HeroText text="Fresh Groceries Delivered to Your Door" />
+                        </motion.div>
+                        <motion.p
+                            className="text-lg text-gray-700 mb-8 max-w-md"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.5 }}
+                        >
+                            Shop from our wide selection of fresh produce, dairy, meats, and pantry essentials with fast delivery and premium quality.
+                        </motion.p>
+                        <motion.button
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-8 rounded-full shadow-LG transition flex items-center gap-2"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.7 }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgha(0,0,0,0.01),0 10px 10px -5px rgb(0,0,0,0.04)" }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => Navigate('')}
+                        >
+                            Shop Now
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                        </motion.button>
+                    </motion.div>
+                    <motion.div
+                        className="md:w-1/2"
+                        initial={{ x: 100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                    >
+                        <motion.img
+                            src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80"
+                            alt="Grocery Delivery"
+                            className="rounded-2xl shadow-2xl"
+                        />
+
+                    </motion.div>
                 </div>
-            </nav>
-            {/* Hero text */}
-            <section className="flex justify-center flex-col items-center py-10 px-5 ">
-                <HeroText />
-                <p className="text-lg text-gray-700 mb-6 max-w-xl p-5">
-                    Your favorite groceries delivered to your doorstep in minutes. Enjoy fresh produce, daily essentials, and more with KiranaKart.
-                </p>
-                <a href="#" className="bg-yellow-400 text-yellow-800 rounded-full font-semibold py-3 px-6 transition hover:bg-yellow-500">Shop Now</a>
-            </section>
-            {/* Offers Section */}
-            <section className="max-w-6xl mx-auto w-full p-4">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Special Offers</h2>
-                <div className="flex flex-wrap justify-center gap-4">
+                {/* Decorative elements */}
+                <motion.div
+                    className="bg-yellow-300 rounded-full w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 opacity-20 absolute -top-24 -right-24"
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 15, 0]
+                    }}
+                    transition={{
+                        duration: 12,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                    }}
+                />
+                <motion.div
+                    className="absolute bg-yellow-400 rounded-full opacity-10 w-64 h-70 sm:w-80 sm:h-[300px] lg:w-96 lg:h-[350px] -bottom-32 -left-32"
+                    animate={{
+                        scale: [1, 1.1, 1],
+                        rotate: [0, -10, 0]
+                    }}
+                    transition={{
+                        duration: 15,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                    }}
+                />
+            </motion.section>
+            {/* Offers Section with Animations */}
+            <motion.section
+                className="max-w-6xl mx-auto w-full p-4"
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+            >
+                <motion.h2
+                    className="text-xl font-bold text-gray-800 text-center mb-4"
+                    variants={itemVariants}
+                >
+                    Special Offers
+                </motion.h2>
+                <motion.div
+                    className="flex flex-wrap justify-center gap-4"
+                    variants={containerVariants}
+                    whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                >
                     {offers.map((offer, idx) => (
-                        <div
+                        <motion.div
                             key={idx}
-                            className={`rounded-xl shadow px-6 py-4 min-w-[220px] ${offer.color} flex flex-col items-start`}
+                            className={`${offer.color} flex flex-col items-start min-h-[90px] w-full sm:w-[48%] lg:w-[30%]  rounded-xl shadow px-6 py-2 mb-2`}
+                            variants={itemVariants}
                         >
                             <div className="font-semibold text-lg text-yellow-900 mb-1">{offer.title}</div>
                             <div className="text-gray-700 text-sm">{offer.desc}</div>
-                        </div>
-                    ))}
-                </div>
-            </section>
 
-            {/* Why Choose Us Section */}
-            <section className="max-w-6xl mx-auto w-full p-4">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Why Choose GrocerEase?</h2>
-                <div className="flex flex-wrap justify-center gap-6">
-                    {features.map((f, idx) => (
-                        <div key={idx} className="flex flex-col items-center bg-white rounded-xl shadow px-8 py-6 w-64">
-                            <span className="text-4xl mb-2">{f.icon}</span>
-                            <div className="font-semibold text-gray-800 mb-1">{f.title}</div>
-                            <div className="text-gray-500 text-sm text-center">{f.desc}</div>
-                        </div>
+                        </motion.div>
                     ))}
+                </motion.div>
+            </motion.section>
+            {/* Why Choose Us Section with Animations */}
+            <motion.section
+                className="bg-gray-50 py-12"
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+            >
+                <div className="max-w-6xl mx-auto">
+                    <motion.h2
+                        className="text-2xl font-bold text-gray-800 text-center mb-8"
+                        variants={itemVariants}
+                    >
+                        Why Choose Us
+                    </motion.h2>
+                    <motion.div
+                        className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-2 place-items-center "
+                        variants={containerVariants}
+
+                    >
+                        {features.map((feature, index) => (
+                            <motion.div
+                                key={index}
+                                className="bg-white p-6 border border-gray-100 text-center rounded-xl shadow-sm m-5 w-50 h-60 sm:w-50 sm:h-60 md:w-50 md:h-60 lg:w-70 lg:h-70 "
+                                variants={itemVariants}
+                                whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
+                            >
+                                <motion.div
+                                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-14 md:h-14 lg:w-24 lg:h-24 mx-auto bg-yellow-100 rounded-full flex justify-center items-center mb-4 text-yellow-600"
+                                    whileHover={{ rotate: 5, scale: 1.1 }}
+                                    transition={{ type: "spring", stiffness: 300 }}
+                                >
+                                    <span className="text-2xl">{feature.icon}</span>
+                                </motion.div>
+                                <h3 className="text-sm sm:text-[18px] font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                                <p className="text-gray-600 text-sm sm:text-[15px] ">{feature.desc}</p>
+                            </motion.div>
+                        ))}
+
+                    </motion.div>
                 </div>
-            </section>
-            {/* Categories Section */}
-            <section className="max-w-6xl mx-auto w-full p-4">
-                <h2 className="font-bold text-2xl justify-center  flex mb-4">Shop by category</h2>
-                <div className="flex flex-wrap gap-6 justify-center">
+            </motion.section>
+
+            {/* Categories Section with Animations */}
+            <motion.section
+                className="max-w-6xl mx-auto w-full p-6"
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+            >
+                <motion.h2
+                    className="text-2xl font-bold text-gray-800 mb-8 text-center"
+                    variants={itemVariants}
+                >
+                    Shop by Category
+                </motion.h2>
+                <motion.div
+                    className="flex flex-wrap gap-6 justify-center"
+                    variants={containerVariants}
+                >
                     {categories.map((cat) => (
                         cat.link ? (
-                            <Link
+                            <motion.div
                                 key={cat.name}
-                                to={cat.link}
-                                className="flex flex-col items-center bg-white rounded-xl shadow px-6 py-4 hover:bg-yellow-100 transition"
-                                style={{ textDecoration: 'none' }}
-                            >
-                                <span className="text-3xl mb-2">{cat.icon}</span>
-                                <span className="font-medium text-gray-700">{cat.name}</span>
-                            </Link>
+                                variants={itemVariants}
+                                whileHover={{
+                                    y: -5, 
+                                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04)",
+                                    backgroundcolor: "#FFFBEB"
+                                }}
 
+                            >
+                                <Link
+                                    to={cat.link}
+                                    className="flex flex-col items-center rounded-xl bg-white shadow px-6 py-4 transition"
+                                    style={{textDecoration:'none'}}
+                                >
+                                    <motion.span
+                                    className="text-3xl mb-2"
+                                    whileHover={{scale:1.1,rotate:5}}
+                                    transition={{type:"spring",stiffness:300}}
+                                    >
+                                        {cat.icon}
+                                    </motion.span>
+                                    <span 
+                                    className="font-medium text-gray-700"
+                                    >{cat.name}</span>
+                                </Link>
+                            </motion.div>
                         ) : (
-                            <button
-                                key={cat.name} className="flex flex-col items-center bg-white py-4 px-6 rounded-xl shadow hover:bg-yellow-100 transition " disabled>
-                                <span className="text-3xl mb-2">{cat.icon}</span>
-                                <span className="font-medium text-gray-600">{cat.name}</span>
-                            </button>
+                            <motion.button>
+                                <span>{cat.icon}</span>
+                                <span>{cat.name}</span>
+                            </motion.button>
                         )
+
+
                     ))}
-                </div>
-            </section>
-            {/* product grid */}
-            <section className="p-4 max-w-6xl  m-auto items-center w-full ">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Popular Groceries</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 ">
-                    <div className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col">
-                        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Fresh Apples" className="w-full h-48 object-cover" />
-                        <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900">Fresh Apples</h3>
-                                <p className="text-gray-500 text-sm mb-2">Crisp and juicy apples, perfect for snacking.</p>
-                            </div>
-                            <div className="flex justify-between items-center mt-2">
-                                <span className="text-yellow-700 font-bold text-lg">$2.99/kg</span>
-                                <button className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add</button>
-                            </div>
-                        </div>
-                    </div>
-                    {/* Product Card 2 */}
-                    <div className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col">
-                        <img src="https://images.unsplash.com/photo-1464306076886-debca5e8a6b0?auto=format&fit=crop&w=400&q=80" alt="Organic Bananas" className="w-full h-48 object-cover" />
-                        <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900">Organic Bananas</h3>
-                                <p className="text-gray-500 text-sm mb-2">Sweet, organic bananas for your daily nutrition.</p>
-                            </div>
-                            <div className="flex justify-between items-center mt-2">
-                                <span className="text-yellow-700 font-bold text-lg">$1.49/kg</span>
-                                <button className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add</button>
-                            </div>
-                        </div>
-                    </div>
-                    {/* Product Card 3 */}
-                    <div className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col">
-                        <img src="https://images.unsplash.com/photo-1502741338009-cac2772e18bc?auto=format&fit=crop&w=400&q=80" alt="Fresh Milk" className="w-full h-48 object-cover" />
-                        <div className="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900">Fresh Milk</h3>
-                                <p className="text-gray-500 text-sm mb-2">Locally sourced, farm-fresh milk delivered daily.</p>
-                            </div>
-                            <div className="flex justify-between items-center mt-2">
-                                <span className="text-yellow-700 font-bold text-lg">$0.99/L</span>
-                                <button className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            {/* Testimonials Section */}
-            <section className="max-w-4xl mx-auto w-full p-4 mt-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">What Our Customers Say</h2>
-                <div className="flex flex-wrap justify-center gap-6">
-                    {testimonials.map((t, idx) => (
-                        <div key={idx} className="bg-white rounded-xl shadow px-6 py-6 flex flex-col items-center w-80">
-                            <img src={t.avatar} alt={t.name} className="w-16 h-16 rounded-full mb-3 object-cover" />
-                            <div className="italic text-gray-700 mb-2 text-center">"{t.review}"</div>
-                            <div className="font-semibold text-yellow-700">{t.name}</div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-            {/* Footer */}
-            <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
-                &copy; 2024 GrocerEase. All rights reserved.
-            </footer>
+                </motion.div>
+            </motion.section>
         </div>
     )
+
 }

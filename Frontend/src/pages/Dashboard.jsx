@@ -1,131 +1,394 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+    FaShoppingCart,
+    FaTruck,
+    FaDollarSign,
+    FaUsers,
+    FaBox,
+    FaExclamationTriangle,
+    FaEye,
+    FaChartLine,
+    FaRedo,
+    FaCalendarAlt,
+    FaClock
+} from 'react-icons/fa';
 import API from "../api"
 
 const Dashboard = () => {
-    const [Stats, setStats] = useState(null)
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
-    useEffect(() => {
-        const fetchStats = async () => {
-            const res = await API.get('/dashboard/stats')
-            setStats(res.data)
+    const fetchDashboardData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
+
+            const response = await API.get('/dashboard/stats', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            setStats(response.data);
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+            setError(error.response?.data?.error || error.message || 'Failed to fetch dashboard data');
+        } finally {
+            setLoading(false);
         }
-        fetchStats()
-    }, [])
+    };
 
-
-    const navigate = useNavigate()
     useEffect(() => {
-        console.log("token in localstorage", localStorage.getItem("token"))
-    }, [])
+        fetchDashboardData();
+    }, [refreshKey]);
 
-    const Logout = (e) => {
-        e.preventDefault()
-        localStorage.removeItem("token")
-        navigate('/')
+    const handleRefresh = () => {
+        setRefreshKey(prev => prev + 1);
+    };
+
+    const navigate = useNavigate();
+
+    const cardVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { type: "spring", stiffness: 100 }
+        }
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 0
+        }).format(amount);
+    };
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'delivered':
+                return 'bg-green-100 text-green-800';
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'processing':
+                return 'bg-blue-100 text-blue-800';
+            case 'shipped':
+                return 'bg-purple-100 text-purple-800';
+            case 'cancelled':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4"
+                    />
+                    <p className="text-gray-600">Loading dashboard data...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center max-w-md mx-auto p-6">
+                    <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">Error Loading Dashboard</h2>
+                    <p className="text-gray-600 mb-6">{error}</p>
+                    <motion.button
+                        onClick={handleRefresh}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 mx-auto"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <FaRedo />
+                        Retry
+                    </motion.button>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <>
-            <div className="min-h-screen flex flex-col text-gray-800">
-                <nav className="bg-yellow-300 flex flex-col sm:flex-row justify-between items-center shadow py-3 px-10 ">
-                    <div className="text-2xl font-bold tracking-wide">KiranaKart Dashboard</div>
-                    <div className="flex gap-4 items-center">
-                        <span className="font-medium ">Admin</span>
-                        <img
-                            src="https://i.pravatar.cc/32"
-                            alt="profile"
-                            className="rounded-full w-8 h-8"
-                        />
-                    </div>
-                </nav>
-                <div className="flex flex-1">
-                    <aside className="bg-white w-56 hidden md:block p-6 ">
-                        <nav className="flex flex-col gap-4">
-                            <a href="#" className="font-semibold text-yellow-600">Dashboard</a>
-                            <a href="#" className="text-gray-700 hover:text-yellow-600">Orders</a>
-                            <a href="#" className="text-gray-700 hover:text-yellow-600">Products</a>
-                            <a href="#" className="text-gray-700 hover:text-yellow-600">Customers</a>
-                            <a href="#" className="text-gray-700 hover:text-yellow-600">Reports</a>
-                            <a href="#" className="text-gray-700 hover:text-yellow-600">Settings</a>
-                        </nav>
-                    </aside>
-                    {Stats && (
-                        <main className="flex-1 p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-7 mb-8">
-                                <div className="bg-white p-6 shadow rounded-lg">
-                                    <div className="text-sm text-gray-500">orders today</div>
-                                    <div className="text-2xl font-bold text-yellow-800">10</div>
-                                </div>
-                                <div className="bg-white p-6 shadow rounded-lg">
-                                    <div className="text-sm text-gray-500">Active Deliveries</div>
-                                    <div className="text-2xl font-bold text-yellow-800">30</div>
-                                </div>
-                                <div className="bg-white p-6 shadow rounded-lg">
-                                    <div className="text-sm text-gray-500">Revenue</div>
-                                    <div className="text-2xl font-bold text-yellow-800">$5,253</div>
-                                </div>
-                                <div className="bg-white p-6 shadow rounded-lg">
-                                    <div className="text-sm text-gray-500">New Customer</div>
-                                    <div className="text-2xl font-bold text-yellow-800">{Stats.customer}</div>
-                                </div>
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <motion.div
+                className="bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-lg"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <div className="max-w-7xl mx-auto px-4 py-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="p-3 bg-yellow-600 rounded-full">
+                                <FaChartLine className="text-white text-2xl" />
                             </div>
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <section className="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
-                                    <h2 className="text-lg font-semibold mb-4">Recent Orders</h2>
-                                    <table className="w-full text-left">
+                            <div>
+                                <h1 className="text-3xl font-bold text-white">Kiranakart Dashboard</h1>
+                                <p className="text-yellow-100">Real-time insights and analytics</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <motion.button
+                                onClick={handleRefresh}
+                                className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <FaRedo />
+                                Refresh
+                            </motion.button>
+                            <span className="text-white font-medium">Admin</span>
+                            <img
+                                src="https://i.pravatar.cc/40"
+                                alt="profile"
+                                className="rounded-full w-10 h-10 border-2 border-white"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                {stats && (
+                    <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        {/* Stats Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <motion.div
+                                className="bg-white p-6 rounded-xl shadow-lg border border-gray-100"
+                                variants={cardVariants}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-600 font-medium">Orders Today</p>
+                                        <p className="text-3xl font-bold text-gray-800">{stats.ordersToday}</p>
+                                    </div>
+                                    <div className="p-3 bg-yellow-100 rounded-full">
+                                        <FaShoppingCart className="text-yellow-600 text-xl" />
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            <motion.div
+                                className="bg-white p-6 rounded-xl shadow-lg border border-gray-100"
+                                variants={cardVariants}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-600 font-medium">Active Deliveries</p>
+                                        <p className="text-3xl font-bold text-gray-800">{stats.activeDeliveries}</p>
+                                    </div>
+                                    <div className="p-3 bg-blue-100 rounded-full">
+                                        <FaTruck className="text-blue-600 text-xl" />
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            <motion.div
+                                className="bg-white p-6 rounded-xl shadow-lg border border-gray-100"
+                                variants={cardVariants}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-600 font-medium">Total Revenue</p>
+                                        <p className="text-3xl font-bold text-gray-800">{formatCurrency(stats.totalRevenue)}</p>
+                                    </div>
+                                    <div className="p-3 bg-green-100 rounded-full">
+                                        <FaDollarSign className="text-green-600 text-xl" />
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            <motion.div
+                                className="bg-white p-6 rounded-xl shadow-lg border border-gray-100"
+                                variants={cardVariants}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-gray-600 font-medium">Total Customers</p>
+                                        <p className="text-3xl font-bold text-gray-800">{stats.customers}</p>
+                                    </div>
+                                    <div className="p-3 bg-purple-100 rounded-full">
+                                        <FaUsers className="text-purple-600 text-xl" />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        {/* Main Content */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Recent Orders */}
+                            <motion.section
+                                className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2 border border-gray-100"
+                                variants={cardVariants}
+                            >
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-yellow-100 rounded-lg">
+                                        <FaBox className="text-yellow-600" />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-gray-800">Recent Orders</h2>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
                                         <thead>
-                                            <tr>
-                                                <th className="py-2">Order ID</th>
-                                                <th className="py-2">Customer</th>
-                                                <th className="py-2">Status</th>
-                                                <th className="py-2">Delivery</th>
-                                                <th className="py-2">Action</th>
+                                            <tr className="border-b border-gray-200">
+                                                <th className="py-3 text-left font-semibold text-gray-700">Order ID</th>
+                                                <th className="py-3 text-left font-semibold text-gray-700">Customer</th>
+                                                <th className="py-3 text-left font-semibold text-gray-700">Amount</th>
+                                                <th className="py-3 text-left font-semibold text-gray-700">Status</th>
+                                                <th className="py-3 text-left font-semibold text-gray-700">Date</th>
+                                                <th className="py-3 text-left font-semibold text-gray-700">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr className="border-t">
-                                                <td className="py-2">#1001</td>
-                                                <td className="py-2">Harshit</td>
-                                                <td className="py-2 text-green-600">Delivered</td>
-                                                <td className="py-2">10:30 AM</td>
-                                                <td className="py-2 text-yellow-600 hover:underline cursor-pointer">View</td>
-                                            </tr>
-                                            <tr className="border-t">
-                                                <td className="py-2">#1002</td>
-                                                <td className="py-2">jon</td>
-                                                <td className="py-2 text-yellow-600">Not Delivered</td>
-                                                <td className="py-2">11:39 AM</td>
-                                                <td className="py-2 text-yellow-600 hover:underline cursor-pointer">View</td>
-                                            </tr>
+                                            {stats.recentOrders && stats.recentOrders.length > 0 ? (
+                                                stats.recentOrders.map((order) => (
+                                                    <tr key={order._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                                        <td className="py-3 font-medium text-gray-800">#{order._id.slice(-6)}</td>
+                                                        <td className="py-3 text-gray-600">{order.userId?.name || 'Unknown'}</td>
+                                                        <td className="py-3 text-gray-600">{formatCurrency(order.amount)}</td>
+                                                        <td className="py-3">
+                                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                                                                {order.status}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-3 text-gray-600">{formatDate(order.createdAt)}</td>
+                                                        <td className="py-3">
+                                                            <button className="text-yellow-600 hover:text-yellow-700 font-medium flex items-center gap-1">
+                                                                <FaEye className="text-sm" />
+                                                                View
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="6" className="py-8 text-center text-gray-500">
+                                                        No recent orders found
+                                                    </td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
-                                </section>
-                                <aside className="flex flex-col gap-6">
-                                    <div className="bg-white rounded-lg shadow p-4">
-                                        <h3 className="font-semibold mb-2">Sales</h3>
-                                        <div className="h-24 justify-center items-center flex text-gray-400">
-                                            [chart placeholder]
+                                </div>
+                            </motion.section>
+
+                            {/* Sidebar */}
+                            <motion.aside
+                                className="flex flex-col gap-6"
+                                variants={cardVariants}
+                            >
+                                {/* Inventory Alerts */}
+                                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 bg-red-100 rounded-lg">
+                                            <FaExclamationTriangle className="text-red-600" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-800">Inventory Alerts</h3>
+                                    </div>
+                                    {stats.lowStockProducts && stats.lowStockProducts.length > 0 ? (
+                                        <ul className="space-y-3">
+                                            {stats.lowStockProducts.map((product) => (
+                                                <li key={product._id} className="flex items-center gap-2 text-sm">
+                                                    <div className={`w-2 h-2 rounded-full ${product.quantity === 0 ? 'bg-red-500' : 'bg-yellow-500'}`}></div>
+                                                    <span className={`font-medium ${product.quantity === 0 ? 'text-red-600' : 'text-yellow-600'}`}>
+                                                        {product.name} - {product.quantity === 0 ? 'Out of Stock' : `${product.quantity} left`}
+                                                    </span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">All products are well stocked!</p>
+                                    )}
+                                </div>
+
+                                {/* Quick Stats */}
+                                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Stats</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 text-sm">Total Products</span>
+                                            <span className="font-semibold text-gray-800">{stats.products}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 text-sm">Total Orders</span>
+                                            <span className="font-semibold text-gray-800">{stats.totalOrders}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 text-sm">Avg Order Value</span>
+                                            <span className="font-semibold text-gray-800">
+                                                {stats.totalOrders > 0 ? formatCurrency(stats.totalRevenue / stats.totalOrders) : '₹0'}
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="bg-white rounded-lg shadow p-4">
-                                        <h3 className="font-semibold mb-2">Inventory Alerts</h3>
-                                        <ul className="text-sm">
-                                            <li className="text-red-600">Tomatoes - Low Stock</li>
-                                            <li className="text-red-600">Milk - Out of Stock</li>
-                                            <li className="text-yellow-600">Bananas - Reorder Soon</li>
-                                        </ul>
-                                    </div>
-                                </aside>
-                            </div>
-                        </main>
-                    )}
-                </div>
-            </div>
+                                </div>
 
-        </>
+                                {/* Quick Actions */}
+                                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
+                                    <div className="space-y-3">
+                                        <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200">
+                                            Add New Product
+                                        </button>
+                                        <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors duration-200">
+                                            View All Orders
+                                        </button>
+                                        <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors duration-200">
+                                            Manage Inventory
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.aside>
+                        </div>
+                    </motion.div>
+                )}
+            </div>
+        </div>
     )
 }
+
 export default Dashboard
 
 

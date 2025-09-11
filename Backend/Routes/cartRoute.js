@@ -1,9 +1,8 @@
-const express = require('express')
-const Router = express.Router()
-const cart = require('../Models/cart')
-const verifytoken = require('../Middleware/authMiddleware')
+import express from 'express';
+import cart from '../Models/cart.js';
+import verifytoken from '../Middleware/authMiddleware.js';
 
-
+const Router = express.Router();
 
 Router.post("/add", verifytoken, async (req, res) => {
     const { productId, quantity } = req.body;
@@ -39,7 +38,6 @@ Router.post("/add", verifytoken, async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
-
 
 Router.get("/", verifytoken, async (req, res) => {
     try {
@@ -102,11 +100,11 @@ Router.put("/update/:id", verifytoken, async (req, res) => {
         userCart.items[itemIndex].quantity = quantity;
         await userCart.save();
 
-        res.status(200).json({ message: "Item quantity updated successfully" });
+        res.status(200).json({ message: "Quantity updated successfully" });
     } catch (error) {
-        console.log("Error updating quantity:", error);
+        console.log("Update quantity Error:", error);
         res.status(500).json({ message: "Server error" });
     }
 });
 
-module.exports = Router
+export default Router;

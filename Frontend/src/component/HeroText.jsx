@@ -20,7 +20,7 @@ export default function HeroText() {
     }, [])
 
     return (
-        <h1 className={`text-2xl md:text-4xl font-extrabold transition-all duration-500 mb-4 ${animate ? "scale-y-100" : "scale-y-0"}`}>
+        <h1 className={`font-extrabold transition-all duration-500 leading-snug text-lg md:text-2xl lg:text-3xl  h-[50px] lg:h-[120px] md:h-[120px] max-w-md mb-4 ${animate ? "scale-y-100" : "scale-y-0"}`}>
         {lines[index]}
     </h1>
 )

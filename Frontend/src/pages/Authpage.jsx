@@ -62,6 +62,7 @@ export default function AuthPage() {
                 <div className="text-2xl font-bold text-gray-800">GrocerEase</div>
                 <div className="flex items-center gap-6 text-base font-medium">
                     <Link to="/home" className="text-gray-700 hover:text-yellow-700 transition">Home</Link>
+                    <Link to="#" className="text-gray-700 hover:text-yellow-700 transition">Shop</Link>
                 </div>
             </nav>
 

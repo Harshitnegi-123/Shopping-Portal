@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+.Toastify__toast-icon svg {
+    fill: #facc15!important;  /* Tailwind yellow-400 hex */
+  }

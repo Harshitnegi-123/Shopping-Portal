@@ -1,10 +1,22 @@
-const { default: mongoose } = require("mongoose");
+import mongoose from "mongoose";
 
-const cartSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    items: [{ productId: String, quantity: Number }],
-    status: { type: String, default: "pending" }, // or: "placed", "shipped", "delivered"
-    createdAt: { type: Date, default: Date.now }
-});
+const orderSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  items: [
+    {
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+      quantity: Number,
+      price: Number,
+    }
+  ],
+  amount: { type: Number, required: true },
+  razorpay: {
+    orderId: String,
+    paymentId: String,
+    signature: String,
+  },
+  status: { type: String, default: "pending" },
+  paidAt: Date,
+}, { timestamps: true });
 
-module.exports = mongoose.module("Order", cartSchema)
+export default mongoose.model("Order", orderSchema);
