@@ -36,14 +36,22 @@ export default function AuthPage() {
         setSuccess("");
 
         try {
-            const url = isLogin ? '/api/auth/login' : '/api/auth/register';
+            const url = isLogin ? '/api/auth/login' : '/api/auth/signup';
             const res = await API.post(url, formData);
             setSuccess(res.data.message);
             localStorage.setItem("token", res.data.token);
-            
+            localStorage.setItem("role", res.data.role);
+            console.log("Login/Signup API response:", res.data);
+
+
             // Delay navigation for a better UX
             setTimeout(() => {
-                navigate('/home');
+                if (res.data.role === "admin") {
+                    navigate("/admin/dashboard");
+                } else {
+                    navigate("/home");
+                }
+
             }, 1000);
         } catch (error) {
             console.log(error);
@@ -57,14 +65,6 @@ export default function AuthPage() {
 
     return (
         <div className="min-h-screen bg-yellow-50 flex flex-col">
-            {/* Navbar */}
-            <nav className="bg-yellow-300 px-6 py-4 flex justify-between items-center shadow">
-                <div className="text-2xl font-bold text-gray-800">GrocerEase</div>
-                <div className="flex items-center gap-6 text-base font-medium">
-                    <Link to="/home" className="text-gray-700 hover:text-yellow-700 transition">Home</Link>
-                    <Link to="#" className="text-gray-700 hover:text-yellow-700 transition">Shop</Link>
-                </div>
-            </nav>
 
             <div className="flex-1 flex flex-col md:flex-row">
                 {/* Left Side - Form */}
@@ -80,9 +80,9 @@ export default function AuthPage() {
                         {/* Decorative elements */}
                         <div className="absolute -top-16 -right-16 w-32 h-32 bg-yellow-100 rounded-full opacity-70"></div>
                         <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-yellow-100 rounded-full opacity-70"></div>
-                        
+
                         <div className="relative z-10">
-                            <motion.h2 
+                            <motion.h2
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 className="text-3xl font-bold text-center mb-8 text-yellow-800"
@@ -91,7 +91,7 @@ export default function AuthPage() {
                             </motion.h2>
 
                             {error && (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm text-center"
@@ -101,7 +101,7 @@ export default function AuthPage() {
                             )}
 
                             {success && (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className="mb-6 p-3 bg-green-50 border border-green-200 text-green-600 rounded-xl text-sm text-center"
@@ -112,7 +112,7 @@ export default function AuthPage() {
 
                             <form onSubmit={handleSubmit}>
                                 {!isLogin && (
-                                    <motion.div 
+                                    <motion.div
                                         custom={0}
                                         variants={formVariants}
                                         initial="hidden"
@@ -126,20 +126,20 @@ export default function AuthPage() {
                                                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                                 </svg>
                                             </div>
-                                            <input 
-                                                type="text" 
-                                                placeholder="Enter your username" 
-                                                value={formData.username} 
-                                                name="username" 
-                                                onChange={handleChange} 
-                                                className="w-full pl-10 pr-4 py-3 border-2 border-yellow-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition bg-yellow-50" 
+                                            <input
+                                                type="text"
+                                                placeholder="Enter your username"
+                                                value={formData.username}
+                                                name="username"
+                                                onChange={handleChange}
+                                                className="w-full pl-10 pr-4 py-3 border-2 border-yellow-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition bg-yellow-50"
                                                 required
                                             />
                                         </div>
                                     </motion.div>
                                 )}
 
-                                <motion.div 
+                                <motion.div
                                     custom={!isLogin ? 1 : 0}
                                     variants={formVariants}
                                     initial="hidden"
@@ -154,19 +154,19 @@ export default function AuthPage() {
                                                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                                             </svg>
                                         </div>
-                                        <input 
-                                            type="email" 
-                                            placeholder="Enter your email" 
-                                            value={formData.email} 
-                                            name="email" 
-                                            onChange={handleChange} 
-                                            className="w-full pl-10 pr-4 py-3 border-2 border-yellow-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition bg-yellow-50" 
+                                        <input
+                                            type="email"
+                                            placeholder="Enter your email"
+                                            value={formData.email}
+                                            name="email"
+                                            onChange={handleChange}
+                                            className="w-full pl-10 pr-4 py-3 border-2 border-yellow-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition bg-yellow-50"
                                             required
                                         />
                                     </div>
                                 </motion.div>
 
-                                <motion.div 
+                                <motion.div
                                     custom={!isLogin ? 2 : 1}
                                     variants={formVariants}
                                     initial="hidden"
@@ -180,13 +180,13 @@ export default function AuthPage() {
                                                 <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                                             </svg>
                                         </div>
-                                        <input 
-                                            type="password" 
-                                            placeholder="Enter your password" 
-                                            value={formData.password} 
-                                            name="password" 
-                                            onChange={handleChange} 
-                                            className="w-full pl-10 pr-4 py-3 border-2 border-yellow-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition bg-yellow-50" 
+                                        <input
+                                            type="password"
+                                            placeholder="Enter your password"
+                                            value={formData.password}
+                                            name="password"
+                                            onChange={handleChange}
+                                            className="w-full pl-10 pr-4 py-3 border-2 border-yellow-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition bg-yellow-50"
                                             required
                                         />
                                     </div>
@@ -198,8 +198,8 @@ export default function AuthPage() {
                                     initial="hidden"
                                     animate="visible"
                                 >
-                                    <button 
-                                        type="submit" 
+                                    <button
+                                        type="submit"
                                         disabled={loading}
                                         className={`w-full py-3 px-4 rounded-xl text-yellow-900 font-bold text-lg shadow-lg transform transition duration-300 ${loading ? 'bg-yellow-300 cursor-not-allowed' : 'bg-yellow-400 hover:bg-yellow-500 hover:scale-105'}`}
                                     >
@@ -215,7 +215,7 @@ export default function AuthPage() {
                                 </motion.div>
                             </form>
 
-                            <motion.div 
+                            <motion.div
                                 custom={!isLogin ? 4 : 3}
                                 variants={formVariants}
                                 initial="hidden"
@@ -260,8 +260,8 @@ export default function AuthPage() {
                             {isLogin ? "Welcome Back!" : "Join GrocerEase Today!"}
                         </h1>
                         <p className="text-lg text-yellow-800 mb-8">
-                            {isLogin 
-                                ? "Sign in to access your account and continue your shopping journey with us." 
+                            {isLogin
+                                ? "Sign in to access your account and continue your shopping journey with us."
                                 : "Create an account to start shopping for fresh groceries delivered to your doorstep."}
                         </p>
                         <div className="flex flex-wrap justify-center gap-4 mb-8">
@@ -283,9 +283,9 @@ export default function AuthPage() {
             </div>
 
             {/* Footer */}
-            <footer className="py-6 text-center text-gray-400 text-sm border-t border-yellow-100 bg-white">
+            {/* <footer className="py-6 text-center text-gray-400 text-sm border-t border-yellow-100 bg-white">
                 &copy; 2024 GrocerEase. All rights reserved.
-            </footer>
+            </footer> */}
         </div>
     );
 }

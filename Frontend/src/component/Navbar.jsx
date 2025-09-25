@@ -53,7 +53,7 @@ function Navbar() {
         <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-lg sticky top-0 z-50"
+            className="bg-gradient-to-r from-yellow-300 to-yellow-400 shadow-lg sticky top-0 z-50"
         >
             <nav className="flex items-center justify-between py-4 px-4 mx-auto max-w-7xl">
                 {/* Logo */}
@@ -186,14 +186,6 @@ function Navbar() {
                                 >
                                     <div className="p-2">
                                         <Link
-                                            to="/dashboard"
-                                            className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-all duration-200"
-                                            onClick={() => setIsUserMenuOpen(false)}
-                                        >
-                                            <FaUser className="text-lg" />
-                                            <span className="font-medium">Dashboard</span>
-                                        </Link>
-                                        <Link
                                             to="/orders"
                                             className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-all duration-200"
                                             onClick={() => setIsUserMenuOpen(false)}
@@ -264,15 +256,6 @@ function Navbar() {
                             >
                                 <FaReceipt className="text-lg" />
                                 <span className="font-medium">Orders</span>
-                            </Link>
-
-                            <Link
-                                to="/dashboard"
-                                className="flex items-center gap-3 px-4 py-3 rounded-lg text-white hover:bg-yellow-600 transition-all duration-200"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <FaUser className="text-lg" />
-                                <span className="font-medium">Dashboard</span>
                             </Link>
 
                             <button

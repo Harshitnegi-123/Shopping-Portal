@@ -58,26 +58,26 @@ function Breadcrumb() {
 
     return (
         <motion.nav
-            className="bg-white border-b border-gray-200 px-4 py-3"
-            initial={{ opacity: 0, y: -10 }}
+            className="px-6 py-2 bg-gray-50"
+            initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
         >
             <div className="max-w-7xl mx-auto">
-                <ol className="flex items-center space-x-2 text-sm">
+                <ol className="flex items-center space-x-2 text-sm text-gray-600">
                     {breadcrumbItems.map((item, index) => (
                         <li key={item.path} className="flex items-center">
                             {index > 0 && (
                                 <FaChevronRight className="text-gray-400 mx-2" />
                             )}
                             {item.current ? (
-                                <span className="text-gray-900 font-medium">
+                                <span className="text-gray-900 font-semibold">
                                     {item.name}
                                 </span>
                             ) : (
                                 <Link
                                     to={item.path}
-                                    className="text-gray-500 hover:text-yellow-600 transition-colors duration-200 flex items-center gap-1"
+                                    className="hover:text-yellow-600 transition-colors duration-200 flex items-center gap-1"
                                 >
                                     {index === 0 && <FaHome className="text-sm" />}
                                     {item.name}

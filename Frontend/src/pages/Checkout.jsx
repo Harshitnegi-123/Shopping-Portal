@@ -113,7 +113,7 @@ export default function Checkout() {
                   { icon: FaMapMarkerAlt, label: "Pincode", key: "pincode", placeholder: "Enter your pincode" },
                 ].map((field, idx) => (
                   <motion.div key={idx} variants={inputVariants} whileFocus="focus" className={field.key === "line1" || field.key === "line2" || field.key === "pincode" ? "sm:col-span-2" : ""}>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <label className=" text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                       <field.icon className="text-yellow-600" />
                       {field.label}
                     </label>
@@ -191,9 +191,8 @@ export default function Checkout() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-
-                {/* PayButton only enabled if form is valid */}
-                {isFormValid && <PayButton amount={totalAmount} />}
+                {/* ✅ Updated: Pass cartItems prop to ensure items are not empty */}
+                {isFormValid && <PayButton amount={totalAmount} cartItems={cartFromState.items} />}
               </div>
 
               <motion.button

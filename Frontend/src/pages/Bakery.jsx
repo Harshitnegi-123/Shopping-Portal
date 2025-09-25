@@ -45,15 +45,14 @@ export default function Bakery() {
     };
     return (
         <div className="min-h-screen bg-yellow-50 flex flex-col">
-            {/* Navbar */}
-            <nav className="bg-yellow-300 px-6 py-4 flex justify-between items-center shadow">
+            {/* <nav className="bg-yellow-300 px-6 py-4 flex justify-between items-center shadow">
                 <div className="text-2xl font-bold text-gray-800">GrocerEase</div>
                 <div className="flex items-center gap-6 text-base font-medium">
                     <a href="/home" className="text-gray-700 hover:text-yellow-700 transition">Home</a>
                     <a href="#" className="text-orange-700 font-semibold">Bakery</a>
                     <a href="/cart" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
                 </div>
-            </nav>
+            </nav> */}
 
             {/* Hero Section */}
             <section className="flex flex-col items-center justify-center text-center py-10 px-4 bg-yellow-50">
@@ -82,7 +81,7 @@ export default function Bakery() {
                                     <p className="text-gray-500 text-sm mb-2">{item.desc}</p>
                                 </div>
                                 <div className="flex justify-between items-center mt-2">
-                                    <span className="text-yellow-700 font-bold text-lg">{item.price}</span>
+                                    <span className="text-yellow-700 font-bold text-lg">${item.price}</span>
 
                                     <button onClick={() => handleAddToCart(item._id)} className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add to cart</button>
                                 </div>
@@ -93,9 +92,9 @@ export default function Bakery() {
             </motion.section>
 
             {/* Footer */}
-            <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
+            {/* <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
                 &copy; 2025 KiranaKart. Made by Harshit Negi.
-            </footer>
+            </footer> */}
             <ToastContainer
                 position="top-right"
                 autoClose={3000}

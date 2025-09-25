@@ -124,4 +124,24 @@ Router.get("/category/:category", async (req, res) => {
     }
 });
 
+// GET product by name
+Router.get("/name/:name", async (req, res) => {
+    const { name } = req.params;
+    try {
+        const product = await Product.findOne({
+            name: { $regex: `^${name}$`, $options: "i" }  // case-insensitive exact match
+        });
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.status(200).json(product);
+    } catch (error) {
+        console.log("Fetch Product by Name Error:", error.message);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
 export default Router;

@@ -11,7 +11,9 @@ Router.post("/add", verifytoken, async (req, res) => {
 
         if (cartItem) {
             // Agar cart already exist karta hai
-            const itemIndex = cartItem.items.findIndex(item => item.productId.equals(productId));
+            const itemIndex = cartItem.items.findIndex(
+                (item) => item.productId.toString() === productId.toString()
+            );
 
             if (itemIndex > -1) {
                 // Agar product already cart me hai to uski quantity badhao

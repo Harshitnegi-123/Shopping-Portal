@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config(); // 💡 This must be the very first thing that runs
+dotenv.config(); // Load environment variables
 
 import connectDB from './Config/DataBase.js';
 import authRoutes from './Routes/authRoutes.js';
@@ -14,39 +14,70 @@ connectDB();
 
 const app = express();
 
-// app.use((req, res, next) => {
-//     res.setHeader(
-//         "Content-Security-Policy",
-//         [
-//             "default-src 'self'",
-//             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com https://www.gstatic.com blob:",
-//             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-//             "font-src 'self' https://fonts.gstatic.com",
-//             "img-src 'self' data: https://*.paypal.com https://*.paypalobjects.com",
-//             "connect-src 'self' https://*.paypal.com https://*.paypalobjects.com",
-//             "frame-src 'self' https://*.paypal.com",
-//             "form-action 'self' https://*.paypal.com"
-//         ].join("; ")
-//     );
-
-//     next();
-// });
-
 // Middlewares
-app.use(cors({ origin: ["http://localhost:5173", "http://localhost:5000"], credentials: true }));
+app.use(cors({
+    origin: ["http://localhost:5173", "http://localhost:5000", "http://localhost:3000"],
+    credentials: true
+}));
 app.use(express.json());
+
 const PORT = process.env.PORT || 5000;
 
-app.use("/dashboard", dashboardRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/cart", cartRoutes);
-app.use("/api/order", orderRoutes);
-
-app.get("/", (req, res) => {
-    res.send("🚀 API is working");
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`, {
+        headers: req.headers.authorization ? 'Token provided' : 'No token',
+        body: req.method === 'POST' ? Object.keys(req.body) : 'N/A'
+    });
+    next();
 });
 
+// Route mounting
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/order", orderRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+
+app.get("/", (req, res) => {
+    res.json({
+        message: "🚀 API is working",
+        routes: [
+            "POST /api/auth/login",
+            "POST /api/auth/signup",
+            "POST /api/auth/admin/signup",
+            "GET /api/auth/verify",
+            "GET /api/dashboard/stats",
+            "GET /api/dashboard/analytics",
+            "GET /api/dashboard/inventory-alerts"
+        ]
+    });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Server Error:', err);
+    res.status(500).json({
+        error: "Internal Server Error",
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({
+        error: "Route not found",
+        message: `Cannot ${req.method} ${req.originalUrl}`,
+        availableRoutes: [
+            "POST /api/auth/login",
+            "GET /api/dashboard/stats"
+        ]
+    });
+});
+
+
 app.listen(PORT, () => {
-    console.log(`server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📊 Dashboard stats available at: http://localhost:${PORT}/api/dashboard/stats`);
+    console.log(`🔐 Auth routes available at: http://localhost:${PORT}/api/auth/*`);
 });

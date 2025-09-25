@@ -32,7 +32,7 @@ const Dashboard = () => {
                 throw new Error('No authentication token found');
             }
 
-            const response = await API.get('/dashboard/stats', {
+            const response = await API.get('/api/dashboard/stats', {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

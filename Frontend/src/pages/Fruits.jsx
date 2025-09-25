@@ -4,6 +4,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer, Bounce } from "react-toastify";
+import {FaShoppingCart} from 'react-icons/fa';
 
 export default function Fruits() {
 
@@ -45,7 +46,7 @@ export default function Fruits() {
   return (
     <div className="min-h-screen bg-yellow-50 flex flex-col">
       {/* Navbar */}
-      <nav className="bg-yellow-300 px-6 py-4 flex justify-between items-center shadow">
+      {/* <nav className="bg-yellow-300 px-6 py-4 flex justify-between items-center shadow">
         <div className="text-2xl font-bold text-gray-800">GrocerEase</div>
         <div className="flex items-center gap-6 text-base font-medium">
           <a href="/home" className="text-gray-700 hover:text-yellow-700 transition">Home</a>
@@ -55,7 +56,7 @@ export default function Fruits() {
             My Orders
           </Link>
         </div>
-      </nav>
+      </nav> */}
 
       {/* Hero Section */}
       <motion.section
@@ -78,7 +79,7 @@ export default function Fruits() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {fruits.map((fruit) => (
             <div
-              key={fruit._id}
+            key={fruit._id}
               className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col"
             >
               {/* Product Detail Link */}
@@ -100,15 +101,16 @@ export default function Fruits() {
                 </div>
 
                 {/* Price + Buttons */}
-                <div className="flex justify-end items-center mt-2 gap-4">
+                <div className="flex justify-between items-center mt-2 gap-4">
                   <span className="text-yellow-700 font-bold text-lg">
-                    ₹{fruit.price}
+                    ${fruit.price}
                   </span>
                   <button
                     onClick={() => handleAddToCart(fruit._id)}
-                    className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition"
+                    className="px-6 py-3 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition"
                   >
-                    Add to cart
+                    <FaShoppingCart className="size-4 text-yellow-800"/>
+
                   </button>
                 </div>
               </div>
@@ -119,9 +121,9 @@ export default function Fruits() {
 
 
       {/* Footer */}
-      <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
+      {/* <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
         &copy; 2025 KiranaKart. Made by Harshit Negi.
-      </footer>
+      </footer> */}
       <ToastContainer
         position="top-right"
         autoClose={3000}

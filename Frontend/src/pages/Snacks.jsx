@@ -44,14 +44,14 @@ export default function Snacks() {
     return (
         <div className="min-h-screen bg-yellow-50 flex flex-col">
             {/* Navbar */}
-            <nav className="bg-yellow-300 px-6 py-4 flex justify-between items-center shadow">
+            {/* <nav className="bg-yellow-300 px-6 py-4 flex justify-between items-center shadow">
                 <div className="text-2xl font-bold text-gray-800">GrocerEase</div>
                 <div className="flex items-center gap-6 text-base font-medium">
                     <a href="/home" className="text-gray-700 hover:text-yellow-700 transition">Home</a>
                     <a href="#" className="text-red-700 font-semibold">Snacks</a>
                     <a href="/cart" className="text-gray-700 hover:text-yellow-700 transition">Cart</a>
                 </div>
-            </nav>
+            </nav> */}
 
             {/* Hero Section */}
             <section className="flex flex-col items-center justify-center text-center py-10 px-4 bg-yellow-50">
@@ -90,9 +90,9 @@ export default function Snacks() {
             </motion.section>
 
             {/* Footer */}
-            <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
+            {/* <footer className="mt-12 py-6 text-center text-gray-400 text-sm border-t border-yellow-100">
                 &copy; 2025 KiranaKart. Made by Harshit Negi.
-            </footer>
+            </footer> */}
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
