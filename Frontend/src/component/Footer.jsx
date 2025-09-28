@@ -143,11 +143,11 @@ function Footer() {
                         <div className="space-y-3">
                             <div className="flex items-center gap-3 text-gray-300 text-sm">
                                 <FaPhone className="text-yellow-400" />
-                                <span>+91 9205800437</span>
+                                <span>+91 9205806354</span>
                             </div>
                             <div className="flex items-center gap-3 text-gray-300 text-sm">
                                 <FaEnvelope className="text-yellow-400" />
-                                <span>harshunegi14@gmail.com</span>
+                                <span>HarshitNegi@gmail.com</span>
                             </div>
                             <div className="flex items-start gap-3 text-gray-300 text-sm">
                                 <FaMapMarkerAlt className="text-yellow-400 mt-1 flex-shrink-0" />

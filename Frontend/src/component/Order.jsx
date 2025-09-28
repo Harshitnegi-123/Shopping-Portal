@@ -77,7 +77,7 @@ export default function Orders() {
               onClick={() => window.location.reload()} 
               className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors"
             >
-              Try Again
+              Try Again or login
             </button>
             <Link to="/" className="block w-full bg-red-600 text-white px-6 py-3 rounded-xl hover:bg-red-700 transition-colors">
               Go Home

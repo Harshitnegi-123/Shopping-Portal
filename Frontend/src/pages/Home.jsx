@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { motion, stagger } from "framer-motion";
+import { motion } from "framer-motion";
 import HeroText from "../component/HeroText";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { div } from "framer-motion/client";
-import { addToCart } from "../api";
 import axios from "axios";
 import { ToastContainer, toast, Bounce } from "react-toastify";
-
 
 const categories = [
     { name: "Fruits", icon: "🍎", link: "/Fruits" },
@@ -54,7 +51,6 @@ const features = [
     },
 ];
 
-
 const testimonials = [
     {
         name: "Priya S.",
@@ -68,67 +64,70 @@ const testimonials = [
     },
 ];
 
-// ProductCard component moved outside
-function ProductCard({ product }) {
-    const navigate = useNavigate(); // ADD THIS LINE - this was missing!
-    const [isAdding, setisAdding] = useState(false);
-
+// ProductCard component - Fixed: Consistent add to cart, fallback for blanks
+function ProductCard({ product, onAddToCart, navigate }) {
+    const [isAdding, setIsAdding] = useState(false);
 
     const handleAddToCart = async () => {
-        const token = localStorage.getItem('token')
-
+        const token = localStorage.getItem('token');
         if (!token) {
-            // user login nahi hai to login page pe bhejo
             navigate("/");
+            toast.error("Please login to add to cart.");
             return;
         }
 
-        // Debug: Log the product data
-        console.log("Product data:", product);
-        console.log("Product _id:", product._id);
-        console.log("Product id:", product.id);
-
-        // Check if this is a default product (has numeric id but no _id)
-        if (typeof product.id === 'number' && !product._id) {
-            alert("This is a demo product. Please browse actual products from our categories!");
-            return;
-        }
-
-        // Make sure we have a valid product ID
+        // Validate product ID
         const productId = product._id || product.id;
         if (!productId) {
             console.error("No valid product ID found");
-            alert("Invalid product. Please try again.");
+            toast.error("Invalid product. Please try again.");
             return;
         }
 
         try {
-            setisAdding(true)
-            console.log("Calling addToCart with ID:", productId);
-            // Call API to add to cart
-            await addToCart(productId)
-            // show success animation
-            setTimeout(() => setisAdding(false), 1000)
+            setIsAdding(true);
+            console.log("Adding to cart:", productId);
+            await axios.post(
+                "http://localhost:5000/api/cart/add",
+                { productId, quantity: 1 },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success("Successfully added to cart! ✅");
+            setTimeout(() => setIsAdding(false), 1000);
         } catch (error) {
             console.error("Error adding to cart:", error);
-            setisAdding(false)
+            if (error.response?.status === 401) {
+                navigate("/");
+            } else {
+                toast.error("Failed to add to cart ❌");
+            }
+            setIsAdding(false);
         }
+    };
+
+    if (!product || !product.name) {
+        return (
+            <div className="bg-white rounded-2xl shadow h-96 flex items-center justify-center text-gray-500 border border-yellow-100">
+                Loading product...
+            </div>
+        );
     }
 
     return (
         <motion.div
             className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col h-full"
-            variants={itemVariants}
             whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
         >
-            <div className="relative overflow-hidden h-48" >
-                <motion.img
-                    src={product.image || product.imgurl} // Handle both image and imgurl
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.3 }}
-                />
+            <div className="relative overflow-hidden h-48">
+                <Link to={`/product/${encodeURIComponent(product.name)}`}>
+                    <motion.img
+                        src={product.image || product.imgurl || "https://via.placeholder.com/300x200?text=No+Image"}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.3 }}
+                    />
+                </Link>
                 <div className="absolute top-2 right-2">
                     <motion.button
                         className="bg-white p-2 rounded-full shadow-md text-yellow-500"
@@ -144,10 +143,10 @@ function ProductCard({ product }) {
             <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
                     <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
-                    <p className="text-gray-500 text-sm mb-2">{product.description}</p>
+                    <p className="text-gray-500 text-sm mb-2">{product.description || "No description available"}</p>
                 </div>
                 <div className="flex justify-between items-center mt-4">
-                    <span className="text-yellow-700 font-bold text-lg">${product.price}/{product.unit || ''}</span>
+                    <span className="text-yellow-700 font-bold text-lg">${product.price || 0}/{product.unit || ''}</span>
                     <motion.button
                         className={`px-4 py-2 text-sm rounded-full ${isAdding ? 'bg-green-500 text-white' : 'bg-yellow-400 text-yellow-900'} font-semibold hover:bg-yellow-500 transition flex items-center gap-1`}
                         whileHover={{ scale: 1.05 }}
@@ -174,26 +173,30 @@ function ProductCard({ product }) {
                     </motion.button>
                 </div>
             </div>
-
         </motion.div>
-    )
+    );
 }
-// FeaturedProductsCarousel Component - No Blank Space
-function FeaturedProductsCarousel({ products }) {
-    const [currentIndex, setCurrentIndex] = useState(0)
-    const [itemsToShow, setItemsToShow] = useState(3)
+
+// FeaturedProductsCarousel - Fixed: Loading, better slicing, no blanks
+function FeaturedProductsCarousel({ products, onAddToCart, navigate }) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [itemsToShow, setItemsToShow] = useState(3);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        setIsLoading(products.length === 0 && !products.loading); // Show loading if no products
+    }, [products]);
 
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth < 640) setItemsToShow(1)
-            else if (window.innerWidth < 1024) setItemsToShow(2)
-            else setItemsToShow(3)
-        }
-
-        handleResize()
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
+            if (window.innerWidth < 640) setItemsToShow(1);
+            else if (window.innerWidth < 1024) setItemsToShow(2);
+            else setItemsToShow(3);
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const totalPages = Math.ceil(products.length / itemsToShow);
 
@@ -206,46 +209,74 @@ function FeaturedProductsCarousel({ products }) {
     };
 
     useEffect(() => {
-        if (products.length > itemsToShow) {
+        if (products.length > itemsToShow && totalPages > 1) {
             const interval = setInterval(nextSlide, 5000);
             return () => clearInterval(interval);
         }
-    }, [currentIndex, products.length, itemsToShow]);
+    }, [currentIndex, products.length, itemsToShow, totalPages]);
 
-    // If products are less than or equal to items to show, don't show the carousel behavior.
-    if (products.length <= itemsToShow) {
+    if (isLoading) {
         return (
-            <div className="flex justify-center gap-6">
-                {products.map((product) => (
-                    <div key={product._id || product.id} className="px-3">
-                        <ProductCard product={product} />
+            <div className="flex justify-center gap-6 py-8">
+                {[...Array(itemsToShow)].map((_, idx) => (
+                    <div key={idx} className="px-3">
+                        <div className="bg-gray-200 rounded-2xl shadow h-96 animate-pulse"></div>
                     </div>
                 ))}
             </div>
         );
     }
 
+    if (products.length === 0) {
+        return (
+            <div className="text-center py-8 text-gray-500">
+                No featured products available right now. Please refresh the page!
+            </div>
+        );
+    }
+
+    // Simple grid if few products
+    if (products.length <= itemsToShow) {
+        return (
+            <div className="flex justify-center gap-6">
+                {products.map((product, idx) => (
+                    <div key={product._id || product.id || idx} className="px-3">
+                        <ProductCard product={product} onAddToCart={onAddToCart} navigate={navigate} />
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    // Carousel
     return (
         <div className="relative overflow-hidden">
             <motion.div
                 className="flex transition-transform duration-500 ease-in-out"
                 style={{
-                    transform: `translateX(-${currentIndex * 100 / totalPages}%)`,
-                    width: `${products.length * (100 / itemsToShow)}%`
+                    transform: `translateX(-${currentIndex * (100 / totalPages)}%)`,
+                    width: `${totalPages * 100}%`
                 }}
+                key={currentIndex} // Remount to avoid glitches
             >
-                {products.map((product) => (
-                    <div key={product._id || product.id} style={{ width: `${100 / itemsToShow}%` }} className="px-3">
-                        <ProductCard product={product} />
+                {Array.from({ length: totalPages }).map((_, pageIdx) => (
+                    <div key={pageIdx} className="flex w-full" style={{ width: `${100 / totalPages}%` }}>
+                        {products
+                            .slice(pageIdx * itemsToShow, (pageIdx + 1) * itemsToShow)
+                            .map((product, idx) => (
+                                <div key={product._id || product.id || idx} className="flex-1 px-3">
+                                    <ProductCard product={product} onAddToCart={onAddToCart} navigate={navigate} />
+                                </div>
+                            ))}
                     </div>
                 ))}
             </motion.div>
 
             {/* Navigation Buttons */}
-            {products.length > itemsToShow && (
+            {totalPages > 1 && (
                 <>
                     <motion.button
-                        className="absolute top-1/2 left-5 transform -translate-y-1/2 -translate-x-1/2 bg-white rounded-full p-2 shadow-md text-yellow-500 z-10"
+                        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md text-yellow-500 z-10"
                         onClick={prevSlide}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
@@ -254,9 +285,8 @@ function FeaturedProductsCarousel({ products }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </motion.button>
-
                     <motion.button
-                        className="absolute top-1/2 right-5 transform -translate-y-1/2 translate-x-1/2 bg-white rounded-full p-2 shadow-md text-yellow-500 z-10"
+                        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md text-yellow-500 z-10"
                         onClick={nextSlide}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
@@ -269,7 +299,7 @@ function FeaturedProductsCarousel({ products }) {
             )}
 
             {/* Dots */}
-            {products.length > itemsToShow && (
+            {totalPages > 1 && (
                 <div className="flex justify-center mt-6 space-x-2">
                     {Array.from({ length: totalPages }).map((_, idx) => (
                         <motion.button
@@ -286,8 +316,6 @@ function FeaturedProductsCarousel({ products }) {
     );
 }
 
-
-
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -296,7 +324,7 @@ const containerVariants = {
             staggerChildren: 0.1
         }
     }
-}
+};
 
 const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -304,70 +332,85 @@ const itemVariants = {
         y: 0,
         opacity: 1,
         transition: { type: "spring", stiffness: 100 }
-        // spring: ek natural bounce effect deta hai(jaise spring ki tarah slide ho ke aa raha ho).
-
-        //     stiffness: jitna zyada stiffness utna tight/ bouncy motion.
     }
-}
+};
+
 export default function Home() {
     const [products, setProducts] = useState([]);
     const [popularProducts, setPopularProducts] = useState([]);
     const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [loading, setLoading] = useState(true); // Loading state for API
+    const navigate = useNavigate(); // Moved after states
 
     useEffect(() => {
-        axios
-            .get("http://localhost:5000/api/products")
-            .then(res => {
-                const allProducts = res.data;
+        const token = localStorage.getItem("token");
+        console.log("Token on Home load:", token);
+    }, []);
 
-                // Popular ke liye categories ke hisaab se filter
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                console.log("Fetching products from API...");
+                const res = await axios.get("http://localhost:5000/api/products");
+                const allProducts = res.data;
+                console.log("API Response (full):", allProducts); // Debug: Check data structure
+
+                if (!allProducts || allProducts.length === 0) {
+                    console.warn("No products received from API");
+                    toast.warning("No products available right now. Please try later.");
+                    setLoading(false);
+                    return;
+                }
+
+                // Filter for popular (one random from each category, handle empty arrays)
                 const fruits = allProducts.filter(p => p.category === "Fruits");
                 const vegetables = allProducts.filter(p => p.category === "Vegetables");
                 const dairy = allProducts.filter(p => p.category === "Dairy");
 
                 const popular = [
-                    fruits[Math.floor(Math.random() * fruits.length)],
-                    vegetables[Math.floor(Math.random() * vegetables.length)],
-                    dairy[Math.floor(Math.random() * dairy.length)]
-                ].filter(Boolean)
+                    fruits.length > 0 ? fruits[Math.floor(Math.random() * fruits.length)] : null,
+                    vegetables.length > 0 ? vegetables[Math.floor(Math.random() * vegetables.length)] : null,
+                    dairy.length > 0 ? dairy[Math.floor(Math.random() * dairy.length)] : null
+                ].filter(Boolean); // Remove nulls
 
+                console.log("Popular products selected:", popular);
 
-                // Featured ke liye random shuffle
+                // Featured: Random shuffle and take 6 (FIXED: Complete sort line)
                 const shuffled = [...allProducts].sort(() => 0.5 - Math.random());
-                const featured = shuffled.slice(0, 6); // pehle 6 items le lo
+                const featured = shuffled.slice(0, 6); // Max 6 for carousel
 
+                console.log("Featured products selected:", featured);
+
+                setProducts(allProducts);
                 setPopularProducts(popular);
                 setFeaturedProducts(featured);
-            })
-            .catch(err => console.error(err));
-    }, []);
-    const handleAddToCart = async (productId) => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                Navigate("/");
-                toast.error("Please login to add to cart.");
-                return;
+                setLoading(false);
+            } catch (err) {
+                console.error("API Error:", err);
+                setLoading(false);
+                toast.error("Failed to fetch products. Please check your connection and refresh!");
+                // Fallback: Set empty arrays to avoid crashes
+                setPopularProducts([]);
+                setFeaturedProducts([]);
             }
+        };
 
-            await axios.post(
-                "http://localhost:5000/api/cart/add",
-                { productId, quantity: 1 },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            toast.success("Successfully added to cart! ✅");
-        } catch (error) {
-            if (error.response && error.response.status === 401) {
-                Navigate("/");
-            } else {
-                toast.error("Failed to add to cart ❌");
-                console.error(error);
-            }
-        }
-    };
-    const Navigate = useNavigate();
+        fetchProducts();
+    }, []); // Empty dependency: Fetch once on mount
+
+    // No separate handleAddToCart needed now, as it's inside ProductCard
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-yellow-50 to-white">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+                    <p className="text-lg text-gray-600">Loading fresh groceries...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-b from-yellow-50 to-white">
@@ -375,13 +418,13 @@ export default function Home() {
             <div className="w-full">
                 {/* Navbar will be rendered from App.jsx */}
             </div>
+
             {/* Hero Section with Animations */}
             <motion.section
-                className="bg-gradient-to-b from-yellow-50 to bg-yellow-100 py-16 overflow-hidden relative z-10 "
+                className="bg-gradient-to-b from-yellow-50 to bg-yellow-100 py-16 overflow-hidden relative z-10"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-
             >
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center">
                     <motion.div
@@ -406,13 +449,18 @@ export default function Home() {
                             Shop from our wide selection of fresh produce, dairy, meats, and pantry essentials with fast delivery and premium quality.
                         </motion.p>
                         <motion.button
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-8 rounded-full shadow-LG transition flex items-center gap-2"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition flex items-center gap-2"
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.6, delay: 0.7 }}
-                            whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgha(0,0,0,0.01),0 10px 10px -5px rgb(0,0,0,0.04)" }}
+                            whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgb(0,0,0,0.04)" }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => Navigate('')}
+                            onClick={() => {
+                                const categorySection = document.getElementById('categories');
+                                if (categorySection) {
+                                    categorySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                            }}
                         >
                             Shop Now
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -429,9 +477,9 @@ export default function Home() {
                         <motion.img
                             src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=500&q=60"
                             alt="Grocery Delivery"
-                            className="rounded-2xl shadow-2xl"
+                            className="rounded-2xl shadow-2xl w-full"
+                            whileHover={{ scale: 1.02 }}
                         />
-
                     </motion.div>
                 </div>
                 {/* Decorative elements */}
@@ -460,6 +508,7 @@ export default function Home() {
                     }}
                 />
             </motion.section>
+
             {/* Offers Section with Animations */}
             <motion.section
                 className="max-w-6xl mx-auto w-full p-4"
@@ -469,7 +518,7 @@ export default function Home() {
                 viewport={{ once: true, amount: 0.2 }}
             >
                 <motion.h2
-                    className="text-xl font-bold text-gray-800 text-center mb-4"
+                    className="text-2xl font-bold text-gray-800 text-center mb-4"
                     variants={itemVariants}
                 >
                     Special Offers
@@ -477,21 +526,21 @@ export default function Home() {
                 <motion.div
                     className="flex flex-wrap justify-center gap-4"
                     variants={containerVariants}
-                    whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
                 >
                     {offers.map((offer, idx) => (
                         <motion.div
                             key={idx}
-                            className={`${offer.color} flex flex-col items-start min-h-[90px] w-full sm:w-[48%] lg:w-[30%]  rounded-xl shadow px-6 py-2 mb-2`}
+                            className={`${offer.color} flex flex-col items-start min-h-[90px] w-full sm:w-[48%] lg:w-[30%] rounded-xl shadow px-6 py-4`}
                             variants={itemVariants}
+                            whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
                         >
                             <div className="font-semibold text-lg text-yellow-900 mb-1">{offer.title}</div>
                             <div className="text-gray-700 text-sm">{offer.desc}</div>
-
                         </motion.div>
                     ))}
                 </motion.div>
             </motion.section>
+
             {/* Why Choose Us Section with Animations */}
             <motion.section
                 className="bg-gray-50 py-12"
@@ -508,35 +557,34 @@ export default function Home() {
                         Why Choose Us
                     </motion.h2>
                     <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-2 place-items-center "
+                        className="grid grid-cols-1 sm:grid-cols-3 gap-6 place-items-center"
                         variants={containerVariants}
-
                     >
                         {features.map((feature, index) => (
                             <motion.div
                                 key={index}
-                                className="bg-white p-6 border border-gray-100 text-center rounded-xl shadow-sm m-5 w-50 h-60 sm:w-50 sm:h-60 md:w-50 md:h-60 lg:w-70 lg:h-70 "
+                                className="bg-white p-6 border border-gray-100 text-center rounded-xl shadow-sm w-full max-w-xs"
                                 variants={itemVariants}
                                 whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
                             >
                                 <motion.div
-                                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-14 md:h-14 lg:w-24 lg:h-24 mx-auto bg-yellow-100 rounded-full flex justify-center items-center mb-4 text-yellow-600"
+                                    className="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex justify-center items-center mb-4 text-yellow-600"
                                     whileHover={{ rotate: 5, scale: 1.1 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                 >
                                     <span className="text-2xl">{feature.icon}</span>
                                 </motion.div>
-                                <h3 className="text-sm sm:text-[18px] font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                                <p className="text-gray-600 text-sm sm:text-[15px] ">{feature.desc}</p>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                                <p className="text-gray-600 text-sm">{feature.desc}</p>
                             </motion.div>
                         ))}
-
                     </motion.div>
                 </div>
             </motion.section>
 
             {/* Categories Section with Animations */}
             <motion.section
+                id="categories"
                 className="max-w-6xl mx-auto w-full p-6"
                 variants={containerVariants}
                 initial="hidden"
@@ -554,50 +602,35 @@ export default function Home() {
                     variants={containerVariants}
                 >
                     {categories.map((cat) => (
-                        cat.link ? (
-                            <motion.div
-                                key={cat.name}
-                                variants={itemVariants}
-                                whileHover={{
-                                    y: -5,
-                                    boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04)",
-                                    backgroundcolor: "#FFFBEB"
-                                }}
-
+                        <motion.div
+                            key={cat.name}
+                            variants={itemVariants}
+                            whileHover={{
+                                y: -5,
+                                boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04)",
+                                backgroundColor: "#FFFBEB"
+                            }}
+                        >
+                            <Link
+                                to={cat.link}
+                                className="flex flex-col items-center rounded-xl bg-white shadow px-6 py-4 transition"
+                                style={{ textDecoration: 'none' }}
                             >
-                                <Link
-                                    to={cat.link}
-                                    className="flex flex-col items-center rounded-xl bg-white shadow px-6 py-4 transition"
-                                    style={{ textDecoration: 'none' }}
+                                <motion.span
+                                    className="text-3xl mb-2"
+                                    whileHover={{ scale: 1.1, rotate: 5 }}
+                                    transition={{ type: "spring", stiffness: 300 }}
                                 >
-                                    <motion.span
-                                        className="text-3xl mb-2"
-                                        whileHover={{ scale: 1.1, rotate: 5 }}
-                                        transition={{ type: "spring", stiffness: 300 }}
-                                    >
-                                        {cat.icon}
-                                    </motion.span>
-                                    <span
-                                        className="font-medium text-gray-700"
-                                    >{cat.name}</span>
-                                </Link>
-                            </motion.div>
-                        ) : (
-                            <motion.button
-                                key={cat.name}
-                                className="flex flex-col items-center bg-white py-4 px-6 rounded-xl shadow transition"
-                                disabled
-                                variants={itemVariants}
-                            >
-                                <span className="text-3xl mb-2">{cat.icon}</span>
-                                <span className="font-medium text-gray-600">{cat.name}</span>
-                            </motion.button>
-                        )
+                                    {cat.icon}
+                                </motion.span>
+                                <span className="font-medium text-gray-700">{cat.name}</span>
+                            </Link>
+                        </motion.div>
                     ))}
                 </motion.div>
             </motion.section>
 
-            {/* Product grid with animations */}
+            {/* Popular Products Section - Now using ProductCard for consistency */}
             <motion.section
                 className="p-6 max-w-6xl mx-auto w-full"
                 variants={containerVariants}
@@ -612,57 +645,30 @@ export default function Home() {
                     Popular Groceries
                 </motion.h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                    {popularProducts.map((item) => (
-                        <div
-                            key={item._id}
-                            className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col"
-                        >
-                            {/* Product Detail Link */}
-                            <Link to={`/product/${encodeURIComponent(item.name)}`}>
-                                <img
-                                    src={item.imgurl}
-                                    alt={item.name}
-                                    className="w-full h-48 object-cover"
-                                />
-                            </Link>
-
-                            {/* Product Info */}
-                            <div className="p-4 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
-                                        {item.name}
-                                    </h3>
-                                    <p className="text-gray-500 text-sm mb-2">{item.description}</p>
-                                </div>
-
-                                {/* Price + Buttons */}
-                                <div className="flex justify-end items-center mt-2 gap-4">
-                                    <span className="text-yellow-700 font-bold text-lg">
-                                        ${item.price}
-                                    </span>
-                                    <button
-                                        onClick={() => handleAddToCart(item._id)}
-                                        className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition"
-                                    >
-                                        Add to cart
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
+                {popularProducts.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">No popular products available right now.</div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        {popularProducts.map((product, idx) => (
+                            <ProductCard
+                                key={product._id || product.id || idx}
+                                product={product}
+                                navigate={navigate}
+                            />
+                        ))}
+                    </div>
+                )}
             </motion.section>
 
             {/* Featured Products Carousel */}
             <motion.section
                 className="py-12 bg-white"
-                viewport={{ once: true, amount: 0.2 }}
+                variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
             >
-                <div className=" max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.h2
                         className="text-2xl font-bold text-gray-800 mb-8 text-center"
                         variants={itemVariants}
@@ -670,22 +676,27 @@ export default function Home() {
                         Featured Products
                     </motion.h2>
 
-
-                    <FeaturedProductsCarousel onAddToCart={handleAddToCart} products={featuredProducts.length > 0 ? featuredProducts : []
-                    } />
+                    <FeaturedProductsCarousel products={featuredProducts} navigate={navigate} />
                 </div>
             </motion.section>
 
             {/* Testimonials Section */}
             <section className="max-w-4xl mx-auto w-full p-4 mt-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">What Our Customers Say</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">What Our Customers Say</h2>
                 <div className="flex flex-wrap justify-center gap-6">
                     {testimonials.map((t, idx) => (
-                        <div key={idx} className="bg-white rounded-xl shadow px-6 py-6 flex flex-col items-center w-80">
+                        <motion.div
+                            key={idx}
+                            className="bg-white rounded-xl shadow px-6 py-6 flex flex-col items-center w-80"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            viewport={{ once: true }}
+                        >
                             <img src={t.avatar} alt={t.name} className="w-16 h-16 rounded-full mb-3 object-cover" />
                             <div className="italic text-gray-700 mb-2 text-center">"{t.review}"</div>
                             <div className="font-semibold text-yellow-700">{t.name}</div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </section>
@@ -695,16 +706,15 @@ export default function Home() {
                 autoClose={3000}
                 hideProgressBar={false}
                 newestOnTop={false}
-                closeOnClick={false}
+                closeOnClick={true}
                 rtl={false}
                 pauseOnFocusLoss
                 draggable
                 pauseOnHover
-                theme="dark"
+                theme="light" // Changed to light for better visibility
                 transition={Bounce}
-                progressClassName="!bg-yellow-400"
+                progressClass="bg-yellow-500"
             />
         </div>
     )
-
 }

@@ -8,15 +8,17 @@ Router.post("/add", verifytoken, async (req, res) => {
     console.log("REQ BODY:", req.body);
     const { name, description, price, imgurl, category } = req.body
     try {
-        const newProduct = new Product({
-            name,
-            description,
-            price,
-            imgurl,
-            category,
-        })
-        await newProduct.save()
-        return res.status(201).json({ message: "Product added successfully" })
+        // const newProduct = new Product({
+        //     name,
+        //     description,
+        //     price,
+        //     imgurl,
+        //     category,
+        // })
+        // await newProduct.save()
+
+        const newProduct = await Product.insertMany(req.body)
+        return res.status(201).json({ message: "Product added successfully", data: newProduct })
     } catch (error) {
         console.log("Add product error:", error.message)
         return res.status(500).json({ message: "Server error" })
