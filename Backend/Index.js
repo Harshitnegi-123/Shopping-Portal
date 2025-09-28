@@ -32,11 +32,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', (req, res) => {
-    res.send('Backend is running');
-});
-
-
 // Route mounting
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
