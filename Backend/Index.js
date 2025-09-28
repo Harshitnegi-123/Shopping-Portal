@@ -40,6 +40,7 @@ app.use("/api/order", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => {
+    console.log("working")
     res.json({
         message: "🚀 API is working",
         routes: [
