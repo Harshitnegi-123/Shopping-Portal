@@ -18,8 +18,8 @@ import Cancleorder from './pages/Cancle'
 import Success from './pages/Success'
 import Layout from './component/Layout'
 import AdminRoute from './component/AdminRoute'
-import Navbar from './component/navbar'
-import Footer from './component/footer'
+import Navbar from './component/Navbar'
+import Footer from './component/Footer'
 
 function AppContent() {
   const location = useLocation();
