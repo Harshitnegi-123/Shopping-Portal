@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 import connectDB from './Config/DataBase.js';
 import authRoutes from './Routes/authRoutes.js';
@@ -14,21 +14,23 @@ connectDB();
 
 const app = express();
 
-// Middlewares
-// app.use(cors({
-//     origin: ["http://localhost:5173", "http://localhost:5000", "http://localhost:3000"],
-//     credentials: true
-// }));
+// CORS Configuration - Vercel ke liye updated
 app.use(cors({
-    origin: [process.env.CLIENT_URL, "http://localhost:5173"],
-    credentials: true
+    origin: [
+        process.env.CLIENT_URL || "https://your-frontend.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-// Debug middleware to log all requests
+// Debug middleware
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`, {
         headers: req.headers.authorization ? 'Token provided' : 'No token',
@@ -36,8 +38,23 @@ app.use((req, res, next) => {
     });
     next();
 });
+
+// Root endpoint
 app.get("/", (req, res) => {
-    res.json({ message: "🚀 API is working" });
+    res.json({
+        message: "🚀 API is working",
+        status: "active",
+        routes: [
+            "POST /api/auth/login",
+            "POST /api/auth/signup",
+            "POST /api/auth/admin/signup",
+            "GET /api/auth/verify",
+            "GET /api/products",
+            "GET /api/cart",
+            "POST /api/order",
+            "GET /api/dashboard/stats"
+        ]
+    });
 });
 
 // Route mounting
@@ -46,22 +63,6 @@ app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
-app.get("/", (req, res) => {
-    console.log("working")
-    res.json({
-        message: "🚀 API is working",
-        routes: [
-            "POST /api/auth/login",
-            "POST /api/auth/signup",
-            "POST /api/auth/admin/signup",
-            "GET /api/auth/verify",
-            "GET /api/dashboard/stats",
-            "GET /api/dashboard/analytics",
-            "GET /api/dashboard/inventory-alerts"
-        ]
-    });
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -76,18 +77,9 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
     res.status(404).json({
         error: "Route not found",
-        message: `Cannot ${req.method} ${req.originalUrl}`,
-        availableRoutes: [
-            "POST /api/auth/login",
-            "GET /api/dashboard/stats"
-        ]
+        message: `Cannot ${req.method} ${req.originalUrl}`
     });
 });
 
-
-app.listen(PORT, () => {
-    // console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📊 Dashboard stats available at: http://localhost:${PORT}/api/dashboard/stats`);
-    console.log(`🔐 Auth routes available at: http://localhost:${PORT}/api/auth/*`);
-});
+// For Vercel serverless deployment
+export default app;
