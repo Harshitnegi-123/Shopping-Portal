@@ -7,7 +7,7 @@ export default function PayButton({ amount, cartItems = [] }) {
   useEffect(() => {
     // ✅ Prioritize prop, fallback to localStorage for persistence
     let cart = cartItems || JSON.parse(localStorage.getItem("cart") || "[]");
-    
+
     // Store order data for persistence (INR amount for DB, USD for PayPal)
     localStorage.setItem("orderTotal", amount.toString());
     localStorage.setItem("orderTotalUSD", (amount * 0.012).toFixed(2)); // Adjust exchange rate if needed
@@ -39,7 +39,7 @@ export default function PayButton({ amount, cartItems = [] }) {
 
               console.log("🔄 Creating PayPal order for USD:", orderData.amount);
 
-              const response = await fetch("http://localhost:5000/api/order/create-order", {
+              const response = await fetch(`${import.meta.env.VITE_API_URL}/api/order/create-order`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default function PayButton({ amount, cartItems = [] }) {
               console.log("📦 Preparing order payload with items:", persistedCart.length);
 
               // ✅ Single API call: Backend handles capture + save
-              const res = await fetch("http://localhost:5000/api/order", {
+              const res = await fetch(`${import.meta.env.VITE_API_URL}/api/order`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -147,8 +147,8 @@ export default function PayButton({ amount, cartItems = [] }) {
   return (
     <div className="space-y-4">
       {/* ✅ PayPal container: Renders buttons if valid, or error message if empty */}
-      <div 
-        ref={paypalRef} 
+      <div
+        ref={paypalRef}
         className="min-h-[45px] flex items-center justify-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-300"
       >
         {cartItems.length === 0 && (
@@ -158,7 +158,7 @@ export default function PayButton({ amount, cartItems = [] }) {
         )}
         {/* If PayPal loads, buttons will fill this div; otherwise, it's empty but styled */}
       </div>
-      
+
       {/* ✅ Always show divider and debit button (independent of PayPal/cart) */}
       <div className="flex items-center justify-center my-4">
         <div className="border-t border-gray-300 flex-grow"></div>

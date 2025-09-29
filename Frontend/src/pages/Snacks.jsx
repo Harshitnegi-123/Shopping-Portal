@@ -9,7 +9,7 @@ export default function Snacks() {
     const navigate = useNavigate();
     const [snacksProducts, setsnacksProducts] = useState([])
     useEffect(() => {
-        axios.get("http://localhost:5000/api/products/category/snacks")
+        axios.get(`${import.meta.env.VITE_API_URL}/api/products/category/snacks`)
             .then(res => setsnacksProducts(res.data))
             .catch(err => console.error(err))
     }, [])
@@ -23,7 +23,7 @@ export default function Snacks() {
             }
 
             const res = await axios.post(
-                "http://localhost:5000/api/cart/add",
+                `${import.meta.env.VITE_API_URL}/api/cart/add`,
                 { productId, quantity: 1 },
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -81,7 +81,7 @@ export default function Snacks() {
                                 </div>
                                 <div className="flex justify-between items-center mt-2">
                                     <span className="text-yellow-700 font-bold text-lg">₹{item.price}</span>
-                                    <button onClick={()=>handleAddToCart(item._id)} className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add to cart</button>
+                                    <button onClick={() => handleAddToCart(item._id)} className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add to cart</button>
                                 </div>
                             </div>
                         </div>

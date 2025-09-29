@@ -15,14 +15,14 @@ export default function Orders() {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const token = localStorage.getItem("token");
         if (!token) {
           throw new Error("User not logged in");
         }
 
         // ✅ Fixed: Use correct API endpoint (/api/order/myorders)
-        const res = await fetch("http://localhost:5000/api/order/myorders", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/order/myorders`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -37,7 +37,7 @@ export default function Orders() {
 
         const ordersData = await res.json();
         setOrders(ordersData);
-        
+
       } catch (err) {
         console.error("Fetch orders error:", err);
         setError(err.message);
@@ -73,8 +73,8 @@ export default function Orders() {
           <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
           <p className="text-gray-600 mb-6">{error}</p>
           <div className="space-y-3">
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors"
             >
               Try Again or login

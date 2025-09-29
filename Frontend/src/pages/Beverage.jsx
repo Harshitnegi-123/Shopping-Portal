@@ -9,7 +9,7 @@ export default function Beverage() {
     const navigate = useNavigate();
     const [beverageProducts, setbeverageProducts] = useState([])
     useEffect(() => {
-        axios.get("http://localhost:5000/api/products/category/beverages")
+        axios.get(`${import.meta.env.VITE_API_URL}/api/products/category/beverages`)
             .then(res => setbeverageProducts(res.data))
             .catch(err => console.error(err))
     }, [])
@@ -23,7 +23,7 @@ export default function Beverage() {
             }
 
             const res = await axios.post(
-                "http://localhost:5000/api/cart/add",
+                `${import.meta.env.VITE_API_URL}/api/cart/add`,
                 { productId, quantity: 1 },
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -72,7 +72,7 @@ export default function Beverage() {
                     {beverageProducts.map((item) => (
                         <div key={item._id} className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col">
                             <Link key={item._id} to={`/product/${encodeURIComponent(item.name)}`}>
-                            <img src={item.imgurl} alt={item.name} className="w-full h-48 object-cover" />
+                                <img src={item.imgurl} alt={item.name} className="w-full h-48 object-cover" />
                             </Link>
                             <div className="p-4 flex-1 flex flex-col justify-between">
                                 <div>
@@ -81,7 +81,7 @@ export default function Beverage() {
                                 </div>
                                 <div className="flex justify-between items-center mt-2">
                                     <span className="text-yellow-700 font-bold text-lg">${item.price}</span>
-                                    <button onClick={()=>handleAddToCart(item._id)} className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add to cart</button>
+                                    <button onClick={() => handleAddToCart(item._id)} className="px-4 py-1 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition">Add to cart</button>
                                 </div>
                             </div>
                         </div>

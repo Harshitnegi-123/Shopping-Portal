@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion"
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import { Link } from "react-router-dom";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function Bakery() {
@@ -11,7 +11,7 @@ export default function Bakery() {
     const navigate = useNavigate();
     const [bakeryProducts, setbakeryProducts] = useState([])
     useEffect(() => {
-        axios.get("http://localhost:5000/api/products/category/bakery")
+        axios.get(`${import.meta.env.VITE_API_URL}/api/products/category/bakery`)
             .then(res => setbakeryProducts(res.data))
             .catch(err => console.error(err))
     }, [])
@@ -25,7 +25,7 @@ export default function Bakery() {
             }
 
             const res = await axios.post(
-                "http://localhost:5000/api/cart/add",
+                `${import.meta.env.VITE_API_URL}/api/cart/add`,
                 { productId, quantity: 1 },
                 {
                     headers: { Authorization: `Bearer ${token}` },

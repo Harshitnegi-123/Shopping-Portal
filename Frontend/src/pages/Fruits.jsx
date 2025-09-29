@@ -4,14 +4,14 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer, Bounce } from "react-toastify";
-import {FaShoppingCart} from 'react-icons/fa';
+import { FaShoppingCart } from 'react-icons/fa';
 
 export default function Fruits() {
 
   const navigate = useNavigate();
   const [fruits, setFruits] = useState([])
   useEffect(() => {
-    axios.get("http://localhost:5000/api/products/category/Fruits")
+    axios.get(`${import.meta.env.VITE_API_URL}/api/products/category/Fruits`)
       .then(res => setFruits(res.data))
       .catch(err => console.error(err))
   }, [])
@@ -25,7 +25,7 @@ export default function Fruits() {
       }
 
       const res = await axios.post(
-        "http://localhost:5000/api/cart/add",
+        `${import.meta.env.VITE_API_URL}/api/cart/add`,
         { productId, quantity: 1 },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -79,7 +79,7 @@ export default function Fruits() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {fruits.map((fruit) => (
             <div
-            key={fruit._id}
+              key={fruit._id}
               className="bg-white rounded-2xl shadow border border-yellow-100 overflow-hidden flex flex-col"
             >
               {/* Product Detail Link */}
@@ -109,7 +109,7 @@ export default function Fruits() {
                     onClick={() => handleAddToCart(fruit._id)}
                     className="px-6 py-3 text-sm rounded-full bg-yellow-400 text-yellow-900 font-semibold hover:bg-yellow-500 transition"
                   >
-                    <FaShoppingCart className="size-4 text-yellow-800"/>
+                    <FaShoppingCart className="size-4 text-yellow-800" />
 
                   </button>
                 </div>
