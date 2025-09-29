@@ -10,7 +10,11 @@ import dashboardRoutes from './Routes/dashboard.js';
 import cartRoutes from "./Routes/cartRoute.js";
 import orderRoutes from "./Routes/orderRoutes.js";
 
-connectDB();
+// App ko pehle create karo (Yeh main fix!)
+const app = express();
+
+// Ab middleware add karo (app ready hai)
+app.use(express.json());  // JSON parsing pehle
 
 // CORS Configuration - Vercel ke liye updated
 app.use(cors({
@@ -22,11 +26,9 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-const app = express();
 
-app.use(express.json());
-
-const PORT = process.env.PORT || 5000;
+// Database connect (ab safe, app ready)
+connectDB();
 
 // Debug middleware
 app.use((req, res, next) => {
@@ -78,6 +80,8 @@ app.use((req, res) => {
         message: `Cannot ${req.method} ${req.originalUrl}`
     });
 });
+
+const PORT = process.env.PORT || 5000;  // Yeh move kiya end mein (optional, use nahi ho raha)
 
 // For Vercel serverless deployment
 export default app;
