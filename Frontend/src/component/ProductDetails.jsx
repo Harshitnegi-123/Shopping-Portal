@@ -12,7 +12,7 @@ export default function Productdetails() {
 
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/products/name/${name}`)
+        axios.get(`${import.meta.env.VITE_BASE_URL}/api/products/name/${name}`)
             .then(res => {
                 console.log(res.data);
                 setproduct(res.data);
