@@ -1,7 +1,7 @@
 import express from "express";
 import paypal from "@paypal/checkout-server-sdk";
-import getClient from "../config/paypal.js";
-import Order from "../models/Order.js";
+import getClient from "../Config/paypal.js";
+import Order from "../Models/order.js";
 import verifytoken from "../Middleware/authMiddleware.js";
 
 const router = express.Router();
