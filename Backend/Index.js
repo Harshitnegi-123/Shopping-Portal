@@ -15,12 +15,11 @@ const app = express();
 
 // Ab middleware add karo (app ready hai)
 app.use(express.json());  // JSON parsing pehle
-
 // CORS Configuration - Vercel ke liye updated
 app.use(cors({
     origin: [
-        "https://shopping-portal-frontend-7oyta1ptd.vercel.app", // Tumhara CURRENT frontend
-        "http://localhost:5173" // Local development
+        "shopping-portal-frontend.vercel.app",
+        "http://localhost:5173"
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
