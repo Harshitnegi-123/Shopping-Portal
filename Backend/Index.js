@@ -12,18 +12,18 @@ import orderRoutes from "./Routes/orderRoutes.js";
 
 connectDB();
 
-const app = express();
-
 // CORS Configuration - Vercel ke liye updated
 app.use(cors({
     origin: [
-        "https://shopping-portal-frontend-3zsxyu0t3.vercel.app", // frontend domain
-        "http://localhost:5173" // local dev
+        "https://shopping-portal-frontend-7oyta1ptd.vercel.app", // Tumhara CURRENT frontend
+        "http://localhost:5173" // Local development
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+const app = express();
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
