@@ -36,6 +36,9 @@ app.use((req, res, next) => {
     });
     next();
 });
+app.get("/", (req, res) => {
+    res.json({ message: "🚀 API is working" });
+});
 
 // Route mounting
 app.use("/api/auth", authRoutes);
