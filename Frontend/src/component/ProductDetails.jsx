@@ -31,7 +31,7 @@ export default function Productdetails() {
             }
 
             await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/cart/add`,
+                `${import.meta.env.VITE_BASE_URL}/api/cart/add`,
                 { productId, quantity: 1 },
                 {
                     headers: { Authorization: `Bearer ${token}` },

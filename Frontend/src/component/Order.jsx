@@ -22,7 +22,7 @@ export default function Orders() {
         }
 
         // ✅ Fixed: Use correct API endpoint (/api/order/myorders)
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/order/myorders`, {
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/order/myorders`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

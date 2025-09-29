@@ -9,7 +9,7 @@ export default function Vegetable() {
   const [vegetables, setvegetables] = useState([])
   const navigate = useNavigate()
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/api/products/category/vegetables`)
+    axios.get(`${import.meta.env.VITE_BASE_URL}/api/products/category/vegetables`)
       .then(res => setvegetables(res.data))
       .catch(err => console.error(err))
   }, [])
@@ -22,7 +22,7 @@ export default function Vegetable() {
         return;
       }
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/cart/add`,
+        `${import.meta.env.VITE_BASE_URL}/api/cart/add`,
         { productId, quantity: 1 },
         {
           headers: { Authorization: `Bearer ${token}` },

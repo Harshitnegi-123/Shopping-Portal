@@ -39,7 +39,7 @@ export default function PayButton({ amount, cartItems = [] }) {
 
               console.log("🔄 Creating PayPal order for USD:", orderData.amount);
 
-              const response = await fetch(`${import.meta.env.VITE_API_URL}/api/order/create-order`, {
+              const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/order/create-order`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default function PayButton({ amount, cartItems = [] }) {
               console.log("📦 Preparing order payload with items:", persistedCart.length);
 
               // ✅ Single API call: Backend handles capture + save
-              const res = await fetch(`${import.meta.env.VITE_API_URL}/api/order`, {
+              const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/order`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",

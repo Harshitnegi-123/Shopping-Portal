@@ -9,7 +9,7 @@ export default function Beverage() {
     const navigate = useNavigate();
     const [beverageProducts, setbeverageProducts] = useState([])
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_API_URL}/api/products/category/beverages`)
+        axios.get(`${import.meta.env.VITE_BASE_URL}/api/products/category/beverages`)
             .then(res => setbeverageProducts(res.data))
             .catch(err => console.error(err))
     }, [])
@@ -23,7 +23,7 @@ export default function Beverage() {
             }
 
             const res = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/cart/add`,
+                `${import.meta.env.VITE_BASE_URL}/api/cart/add`,
                 { productId, quantity: 1 },
                 {
                     headers: { Authorization: `Bearer ${token}` },

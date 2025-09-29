@@ -18,7 +18,7 @@ app.use(express.json());  // JSON parsing pehle
 // CORS Configuration - Vercel ke liye updated
 app.use(cors({
     origin: [
-        "shopping-portal-frontend.vercel.app",
+        "http://shopping-portal-frontend.vercel.app",
         "http://localhost:5173"
     ],
     credentials: true,

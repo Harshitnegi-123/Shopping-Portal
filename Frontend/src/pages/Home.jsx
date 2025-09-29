@@ -88,7 +88,7 @@ function ProductCard({ product, onAddToCart, navigate }) {
             setIsAdding(true);
             console.log("Adding to cart:", productId);
             await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/cart/add`,
+                `${import.meta.env.VITE_BASE_URL}/api/cart/add`,
                 { productId, quantity: 1 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -352,7 +352,7 @@ export default function Home() {
             try {
                 setLoading(true);
                 console.log("Fetching products from API...");
-                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
+                const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/products`);
                 const allProducts = res.data;
                 console.log("API Response (full):", allProducts); // Debug: Check data structure
 

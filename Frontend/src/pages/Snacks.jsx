@@ -9,7 +9,7 @@ export default function Snacks() {
     const navigate = useNavigate();
     const [snacksProducts, setsnacksProducts] = useState([])
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_API_URL}/api/products/category/snacks`)
+        axios.get(`${import.meta.env.VITE_BASE_URL}/api/products/category/snacks`)
             .then(res => setsnacksProducts(res.data))
             .catch(err => console.error(err))
     }, [])
@@ -23,7 +23,7 @@ export default function Snacks() {
             }
 
             const res = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/cart/add`,
+                `${import.meta.env.VITE_BASE_URL}/api/cart/add`,
                 { productId, quantity: 1 },
                 {
                     headers: { Authorization: `Bearer ${token}` },

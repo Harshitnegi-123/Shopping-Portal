@@ -11,7 +11,7 @@ export default function Bakery() {
     const navigate = useNavigate();
     const [bakeryProducts, setbakeryProducts] = useState([])
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_API_URL}/api/products/category/bakery`)
+        axios.get(`${import.meta.env.VITE_BASE_URL}/api/products/category/bakery`)
             .then(res => setbakeryProducts(res.data))
             .catch(err => console.error(err))
     }, [])
@@ -25,7 +25,7 @@ export default function Bakery() {
             }
 
             const res = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/cart/add`,
+                `${import.meta.env.VITE_BASE_URLL}/api/cart/add`,
                 { productId, quantity: 1 },
                 {
                     headers: { Authorization: `Bearer ${token}` },
