@@ -16,11 +16,34 @@ const app = express();
 // Ab middleware add karo (app ready hai)
 app.use(express.json());  // JSON parsing pehle
 // CORS Configuration - Vercel ke liye updated
+// app.use(cors({
+//     origin: [
+//         "http://shopping-portal-frontend.vercel.app",
+//         "http://localhost:5173"
+//     ],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
 app.use(cors({
-    origin: [
-        "http://shopping-portal-frontend.vercel.app",
-        "http://localhost:5173"
-    ],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        // Allow all Vercel preview/production URLs + localhost
+        const allowedPatterns = [
+            /^https:\/\/shopping-portal-frontend.*\.vercel\.app$/,
+            /^http:\/\/localhost:\d+$/
+        ];
+
+        const isAllowed = allowedPatterns.some(pattern => pattern.test(origin));
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
