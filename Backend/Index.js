@@ -31,8 +31,12 @@ app.use(cors({
         if (!origin) return callback(null, true);
 
         // Allow all Vercel preview/production URLs + localhost
+        // const allowedPatterns = [
+        //     /^https:\/\/shopping-portal-frontend.*\.vercel\.app$/,
+        //     /^http:\/\/localhost:\d+$/
+        // ];
         const allowedPatterns = [
-            /^https:\/\/shopping-portal-frontend.*\.vercel\.app$/,
+            /^https:\/\/.*\.vercel\.app$/,
             /^http:\/\/localhost:\d+$/
         ];
 
