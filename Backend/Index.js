@@ -17,14 +17,13 @@ const app = express();
 // CORS Configuration - Vercel ke liye updated
 app.use(cors({
     origin: [
-        "https://shopping-portal-frontend-3zsxyu0t3.vercel.app", // actual frontend domain
-        "http://localhost:5173"
+        "https://shopping-portal-frontend-3zsxyu0t3.vercel.app", // frontend domain
+        "http://localhost:5173" // local dev
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
