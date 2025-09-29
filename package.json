@@ -8,6 +8,7 @@
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",
     "concurrently": "^9.2.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "framer-motion": "^12.23.6",
     "paytm-pg-node-sdk": "^1.0.6",
