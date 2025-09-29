@@ -352,9 +352,7 @@ export default function Home() {
             try {
                 setLoading(true);
                 console.log("Fetching products from API...");
-                // const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-                const API_URL = "https://shopping-portal-khaki.vercel.app";
-                const res = await axios.get(`${API_URL}/api/products`);
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
                 const allProducts = res.data;
                 console.log("API Response (full):", allProducts); // Debug: Check data structure
 
