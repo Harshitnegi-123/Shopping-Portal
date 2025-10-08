@@ -6,37 +6,108 @@ import verifytoken from "../Middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// ✅ Create PayPal order
+// ✅ Create PayPal order with proper validation
 router.post("/create-order", async (req, res) => {
-  const { amount } = req.body;
-  console.log("🔄 Creating PayPal order for amount:", amount);
+  try {
+    const { items, totalAmount } = req.body;
 
-  const request = new paypal.orders.OrdersCreateRequest();
-  request.prefer("return=representation");
-  request.requestBody({
-    intent: "CAPTURE",
-    purchase_units: [
-      {
+    // Validation
+    if (!items || items.length === 0) {
+      return res.status(400).json({ 
+        error: "Cart is empty" 
+      });
+    }
+
+    // Calculate items total
+    let itemsTotal = 0;
+    const paypalItems = items.map(item => {
+      const itemPrice = parseFloat(item.price);
+      const itemQuantity = parseInt(item.quantity);
+      const itemTotal = itemPrice * itemQuantity;
+      
+      itemsTotal += itemTotal;
+      
+      return {
+        name: item.name.substring(0, 127), // PayPal max 127 chars
+        description: item.description?.substring(0, 127) || "Product",
+        unit_amount: {
+          currency_code: "USD",
+          value: itemPrice.toFixed(2) // ⚠️ Must be string with 2 decimals
+        },
+        quantity: itemQuantity.toString(), // ⚠️ Must be string
+        category: "PHYSICAL_GOODS"
+      };
+    });
+
+    // Round totals to 2 decimals
+    itemsTotal = parseFloat(itemsTotal.toFixed(2));
+    const finalTotal = parseFloat(totalAmount.toFixed(2));
+
+    // ⚠️ CRITICAL: Validation - amounts must match
+    if (Math.abs(itemsTotal - finalTotal) > 0.01) {
+      console.error('❌ Amount mismatch:', { 
+        itemsTotal, 
+        finalTotal,
+        difference: Math.abs(itemsTotal - finalTotal)
+      });
+      return res.status(400).json({
+        error: "Amount calculation mismatch",
+        details: { calculated: itemsTotal, sent: finalTotal }
+      });
+    }
+
+    console.log("🔄 Creating PayPal order for USD:", finalTotal);
+    console.log("📦 Items:", paypalItems.length);
+
+    // Create PayPal request
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.prefer("return=representation");
+    request.requestBody({
+      intent: "CAPTURE",
+      purchase_units: [{
         amount: {
           currency_code: "USD",
-          value: amount,
+          value: finalTotal.toFixed(2), // ⚠️ Total as string
+          breakdown: {
+            item_total: {
+              currency_code: "USD",
+              value: itemsTotal.toFixed(2) // ⚠️ Must match items sum
+            }
+          }
         },
-      },
-    ],
-    application_context: {
-      return_url: "http://localhost:5173/order-success",
-      cancel_url: "http://localhost:5173/cancel",
-    },
-  });
+        items: paypalItems,
+        description: `Order of ${items.length} items`
+      }],
+      application_context: {
+        brand_name: "Shopping Portal",
+        landing_page: "BILLING",
+        user_action: "PAY_NOW",
+        return_url: `${process.env.CLIENT_URL}/order-success`, // ⚠️ Use env variable
+        cancel_url: `${process.env.CLIENT_URL}/cart`
+      }
+    });
 
-  try {
+    // Execute PayPal request
     const client = getClient();
     const order = await client.execute(request);
+    
     console.log("✅ PayPal order created:", order.result.id);
-    res.json(order.result);
+    console.log("💰 Amount:", order.result.purchase_units[0].amount.value);
+    
+    res.json({
+      success: true,
+      orderID: order.result.id,
+      status: order.result.status
+    });
+
   } catch (err) {
-    console.error("❌ Create order error:", err);
-    res.status(500).send({ error: err.message });
+    console.error("❌ PayPal order creation error:", err);
+    console.error("Error details:", err.details);
+    
+    res.status(500).json({ 
+      error: err.message,
+      details: err.details || []
+    });
   }
 });
 
