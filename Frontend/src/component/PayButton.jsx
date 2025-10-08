@@ -191,17 +191,51 @@ export default function PayButton({ amount, cartItems = [] }) {
       return;
     }
 
+    // ✅ NEW: Validate and clean cart items (prevent NaN)
+    const validatedCart = cart
+      .map(item => {
+        const price = parseFloat(item.price);  // Clean price (remove $ or invalid)
+        const quantity = parseInt(item.quantity) || 1;  // Default 1 if invalid
+        
+        if (isNaN(price) || price <= 0) {
+          console.error("❌ Invalid price in cart:", item);
+          return null;  // Skip invalid item
+        }
+        
+        return {
+          ...item,
+          price: price,  // Cleaned number
+          quantity: quantity
+        };
+      })
+      .filter(item => item !== null);  // Remove invalid items
+
+    if (validatedCart.length === 0) {
+      console.error("❌ No valid items in cart after validation!");
+      alert("Invalid cart items. Please refresh and try again.");
+      return;
+    }
+
     const amountINR = Number(amount);
-    const amountUSD = parseFloat((amountINR * 0.012).toFixed(2));
-    
+    if (isNaN(amountINR) || amountINR <= 0) {
+      console.error("❌ Invalid total amount:", amount);
+      return;
+    }
+
+    // Recalculate USD with validated items
+    const itemsTotalUSD = validatedCart.reduce((sum, item) => sum + (item.price * 0.012 * item.quantity), 0);
+    const amountUSD = parseFloat(itemsTotalUSD.toFixed(2));
+
+    // Store validated data
     localStorage.setItem("orderTotal", amountINR.toString());
     localStorage.setItem("orderTotalUSD", amountUSD.toString());
-    localStorage.setItem("pendingOrderCart", JSON.stringify(cart));
+    localStorage.setItem("pendingOrderCart", JSON.stringify(validatedCart));
 
-    console.log("💾 Order data:", {
+    console.log("💾 Validated order data:", {
       INR: amountINR,
       USD: amountUSD,
-      items: cart.length
+      validItems: validatedCart.length,
+      samplePrice: validatedCart[0]?.price  // Debug: First item's clean price
     });
 
     if (window.paypal) {
@@ -209,27 +243,31 @@ export default function PayButton({ amount, cartItems = [] }) {
         .Buttons({
           createOrder: async (data, actions) => {
             try {
-              // ✅ Convert INR prices to USD for PayPal
+              // ✅ Use validated cart for orderData
               const orderData = {
-                items: cart.map(item => ({
-                  name: item.name || "Product",
-                  description: item.description || item.category || "Product",
-                  price: parseFloat((item.price * 0.012).toFixed(2)), // INR → USD
-                  quantity: parseInt(item.quantity)
+                items: validatedCart.map(item => ({
+                  name: (item.name || "Product").substring(0, 127),
+                  description: (item.description || item.category || "Product").substring(0, 127),
+                  price: parseFloat((item.price * 0.012).toFixed(2)),  // INR → USD, safe now
+                  quantity: item.quantity.toString()  // String for PayPal
                 })),
-                totalAmount: amountUSD
+                totalAmount: amountUSD.toFixed(2)  // String with 2 decimals
               };
 
-              console.log("🔄 Creating PayPal order for USD:", amountUSD);
-              console.log("📦 Items:", orderData.items);
+              // ✅ Double-check no NaN before send
+              const hasNaN = orderData.items.some(item => isNaN(item.price)) || isNaN(parseFloat(orderData.totalAmount));
+              if (hasNaN) {
+                throw new Error("Invalid amount calculation – please refresh cart");
+              }
+
+              console.log("🔄 Creating PayPal order for USD:", orderData.totalAmount);
+              console.log("📦 Validated items:", orderData.items);
 
               const response = await fetch(
                 `${import.meta.env.VITE_BASE_URL}/api/order/create-order`,
                 {
                   method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
+                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify(orderData),
                 }
               );
@@ -260,17 +298,16 @@ export default function PayButton({ amount, cartItems = [] }) {
                 throw new Error("Please login to complete order");
               }
 
-              // Get cart from state or localStorage
-              const persistedCart = cart.length > 0 ? cart : JSON.parse(localStorage.getItem("pendingOrderCart") || "[]");
+              // Use validated cart
+              const persistedCart = validatedCart.length > 0 ? validatedCart : JSON.parse(localStorage.getItem("pendingOrderCart") || "[]");
               const totalAmount = Number(localStorage.getItem("orderTotal") || amount);
 
               if (persistedCart.length === 0) {
                 throw new Error("Cart is empty");
               }
 
-              console.log("💾 Saving order with", persistedCart.length, "items");
+              console.log("💾 Saving order with", persistedCart.length, "validated items");
 
-              // ✅ Use combined capture + save endpoint
               const response = await fetch(
                 `${import.meta.env.VITE_BASE_URL}/api/order`,
                 {
@@ -282,15 +319,13 @@ export default function PayButton({ amount, cartItems = [] }) {
                   body: JSON.stringify({
                     items: persistedCart.map(item => ({
                       name: item.name,
-                      price: item.price, // Keep INR for database
+                      price: item.price,  // INR for DB
                       quantity: item.quantity,
-                      productId: item._id || item.productId
+                      productId: item._id || item.productId  // Handle ID
                     })),
-                    amount: totalAmount, // INR amount for database
-                    paypal: {
-                      orderId: data.orderID
-                    },
-                    capturePayment: true // ✅ Backend will capture + save
+                    amount: totalAmount,  // INR
+                    paypal: { orderId: data.orderID },
+                    capturePayment: true
                   }),
                 }
               );
@@ -302,21 +337,19 @@ export default function PayButton({ amount, cartItems = [] }) {
               }
 
               const savedOrder = await response.json();
-              console.log("✅ Order saved successfully:", savedOrder._id);
+              console.log("✅ Order saved:", savedOrder._id);
 
-              // Clear cart
+              // Clear storage
               localStorage.removeItem("cart");
               localStorage.removeItem("pendingOrderCart");
               localStorage.removeItem("orderTotal");
               localStorage.removeItem("orderTotalUSD");
 
-              // Redirect to success page
               alert("✅ Payment successful! Order ID: " + savedOrder._id);
               window.location.href = `/order-success?orderID=${savedOrder._id}&paypalOrderId=${data.orderID}`;
-
             } catch (error) {
               console.error("❌ Error saving order:", error);
-              alert(`Payment approved but order save failed: ${error.message}. Please contact support with PayPal Order ID: ${data.orderID}`);
+              alert(`Payment approved but save failed: ${error.message}. Contact support with PayPal ID: ${data.orderID}`);
             }
           },
 
@@ -342,7 +375,8 @@ export default function PayButton({ amount, cartItems = [] }) {
     } else {
       console.error("❌ PayPal SDK not loaded");
     }
-  }, [amount, cartItems]);
+  }, [amount, cartItems]);  // Dependencies same
+  
 
   return (
     <div className="space-y-4">
