@@ -186,7 +186,7 @@ export default function PayButton({ amount, cartItems = [] }) {
   useEffect(() => {
     // ✅ Prioritize prop, fallback to localStorage for persistence
     let cart = cartItems || JSON.parse(localStorage.getItem("cart") || "[]");
-
+      
     // Store order data for persistence (INR amount for DB, USD for PayPal)
     localStorage.setItem("orderTotal", amount.toString());
     localStorage.setItem("orderTotalUSD", (amount * 0.012).toFixed(2));
@@ -348,6 +348,7 @@ export default function PayButton({ amount, cartItems = [] }) {
           </p>
         )}
       </div>
+
 
       <div className="flex items-center justify-center my-4">
         <div className="border-t border-gray-300 flex-grow"></div>

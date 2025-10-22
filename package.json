@@ -11,6 +11,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "framer-motion": "^12.23.6",
+    "helmet": "^8.1.0",
     "paytm-pg-node-sdk": "^1.0.6",
     "paytmchecksum": "^1.5.1",
     "razorpay": "^2.9.6",

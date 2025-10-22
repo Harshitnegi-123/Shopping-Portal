@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import helmet from "helmet";
+
 dotenv.config();
 
 import connectDB from './Config/DataBase.js';
@@ -15,6 +17,34 @@ const app = express();
 
 // Ab middleware add karo (app ready hai)
 app.use(express.json());  // JSON parsing pehle
+
+// ✅ Add Content Security Policy to allow PayPal scripts
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "blob:",
+                "https://*.paypal.com",
+                "https://*.paypalobjects.com",
+                "https://*.braintreegateway.com"
+            ],
+            frameSrc: [
+                "https://*.paypal.com",
+                "https://*.paypalobjects.com"
+            ],
+            imgSrc: ["'self'", "data:", "https://*.paypal.com", "https://*.paypalobjects.com"],
+            connectSrc: [
+                "'self'",
+                "https://api-m.sandbox.paypal.com",
+                "https://api-m.paypal.com"
+            ]
+        },
+    })
+);
+
 
 app.use(cors({
     origin: function (origin, callback) {
