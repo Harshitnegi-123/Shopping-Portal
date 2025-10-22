@@ -5,13 +5,16 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://*.paypal.com https://*.paypalobjects.com https://*.braintreegateway.com; frame-src https://*.paypal.com https://*.paypalobjects.com; img-src 'self' data: https://*.paypal.com https://*.paypalobjects.com; connect-src 'self' https://api-m.sandbox.paypal.com https://api-m.paypal.com;">
   <title>Vite + React</title>
 </head>
 
 <body class="bg-yellow-50">
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-  <script src="https://www.paypal.com/sdk/js?client-id=AQB2kwlOOLtmwz4lannRTpAF_Pdhi4eV35FW9Q-B6GMBNjmxVc8HuzUKm-3nEN4XwkT2s05f89fPKYNg&currency=USD"></script>
+  <script
+    src="https://www.paypal.com/sdk/js?client-id=AQB2kwlOOLtmwz4lannRTpAF_Pdhi4eV35FW9Q-B6GMBNjmxVc8HuzUKm-3nEN4XwkT2s05f89fPKYNg&currency=USD"></script>
 
 </body>
 
