@@ -13,7 +13,7 @@ export default function Beverage() {
         setloading(true)
         axios.get(`${import.meta.env.VITE_BASE_URL}/api/products/category/beverages`)
             .then(res => {
-                setdairyProducts(res.data)
+                setbeverageProducts(res.data)
                 setloading(false)
             })
             .catch(err => {
