@@ -17,45 +17,22 @@ const app = express();
 
 // Ab middleware add karo (app ready hai)
 app.use(express.json());  // JSON parsing pehle
+app.use(helmet());      // Helmet pehle
 
-// ✅ Add Content Security Policy to allow PayPal scripts
-app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                "blob:",
-                "https://*.paypal.com",
-                "https://*.paypalobjects.com",
-                "https://*.braintreegateway.com"
-            ],
-            frameSrc: [
-                "https://*.paypal.com",
-                "https://*.paypalobjects.com"
-            ],
-            imgSrc: ["'self'", "data:", "https://*.paypal.com", "https://*.paypalobjects.com"],
-            connectSrc: [
-                "'self'",
-                "https://api-m.sandbox.paypal.com",
-                "https://api-m.paypal.com"
-            ]
-        },
-    })
-);
+// ✅ Manual CSP header for PayPal (works better on Vercel)
+app.use((req, res, next) => {
+    res.setHeader(
+        "Content-Security-Policy",
+        "default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://*.paypal.com https://*.paypalobjects.com https://*.braintreegateway.com; frame-src https://*.paypal.com https://*.paypalobjects.com; img-src 'self' data: https://*.paypal.com https://*.paypalobjects.com; connect-src 'self' https://api-m.sandbox.paypal.com https://api-m.paypal.com"
+    );
+    next();
+});
 
 
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-
-        // Allow all Vercel preview/production URLs + localhost
-        // const allowedPatterns = [
-        //     /^https:\/\/shopping-portal-frontend.*\.vercel\.app$/,
-        //     /^http:\/\/localhost:\d+$/
-        // ];
         const allowedPatterns = [
             /^https:\/\/.*\.vercel\.app$/,
             /^http:\/\/localhost:\d+$/
