@@ -15,18 +15,21 @@ import orderRoutes from "./Routes/orderRoutes.js";
 // App ko pehle create karo (Yeh main fix!)
 const app = express();
 
-// Ab middleware add karo (app ready hai)
-app.use(express.json());  // JSON parsing pehle
-app.use(helmet());      // Helmet pehle
-
-// ✅ Manual CSP header for PayPal (works better on Vercel)
 app.use((req, res, next) => {
     res.setHeader(
         "Content-Security-Policy",
-        "default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://*.paypal.com https://*.paypalobjects.com https://*.braintreegateway.com; frame-src https://*.paypal.com https://*.paypalobjects.com; img-src 'self' data: https://*.paypal.com https://*.paypalobjects.com; connect-src 'self' https://api-m.sandbox.paypal.com https://api-m.paypal.com"
+        "default-src 'self';" +
+        "script-src 'self' 'unsafe-inline' blob: https://*.paypal.com https://*.paypalobjects.com https://*.braintreegateway.com;" +
+        "frame-src https://*.paypal.com https://*.paypalobjects.com;" +
+        "img-src 'self' data: https://*.paypal.com https://*.paypalobjects.com;" +
+        "connect-src 'self' https://api-m.sandbox.paypal.com https://api-m.paypal.com"
     );
     next();
 });
+
+// Ab middleware add karo (app ready hai)
+app.use(express.json());  // JSON parsing pehle
+app.use(helmet());      // Helmet pehle
 
 
 app.use(cors({
