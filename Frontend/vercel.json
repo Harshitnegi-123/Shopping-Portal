@@ -19,7 +19,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com https://*.braintreegateway.com https://apis.google.com blob:; frame-src 'self' https://*.paypal.com; connect-src 'self' https://*.paypal.com https://*.braintreegateway.com"
+          "value": "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com https://*.braintreegateway.com https://apis.google.com https://www.googletagmanager.com https://www.google-analytics.com blob:; frame-src 'self' https://*.paypal.com; connect-src 'self' https://*.paypal.com https://*.braintreegateway.com https://www.google-analytics.com https://*.vercel.app https://shopping-portal-khaki.vercel.app; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'"
         }
       ]
     }
