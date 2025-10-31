@@ -16,6 +16,10 @@
         {
           "key": "X-Frame-Options",
           "value": "DENY"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com https://*.braintreegateway.com https://apis.google.com blob:; frame-src 'self' https://*.paypal.com; connect-src 'self' https://*.paypal.com https://*.braintreegateway.com"
         }
       ]
     }
