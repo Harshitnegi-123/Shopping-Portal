@@ -4,13 +4,13 @@ import helmet from "helmet";
 dotenv.config();
 
 import connectDB from './Config/DataBase.js';
-import authRoutes from './Routes/authRoutes.js';
-import productRoutes from "./Routes/productRoutes.js";
+import authRoutes from './routes_/authRoutes.js';
+import productRoutes from "./routes_/productRoutes.js";
 import cors from 'cors';
 import express from 'express';
-import dashboardRoutes from './Routes/dashboard.js';
-import cartRoutes from "./Routes/cartRoute.js";
-import orderRoutes from "./Routes/orderRoutes.js";
+import dashboardRoutes from './routes_/dashboard.js';
+import cartRoutes from "./routes_/cartRoute.js";
+import orderRoutes from "./routes_/orderRoutes.js";
 
 // App ko pehle create karo (Yeh main fix!)
 const app = express();
