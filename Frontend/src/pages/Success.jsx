@@ -23,7 +23,7 @@ export default function Success() {
         console.log("🔄 Capturing payment for:", paymentId);
         
         const captureRes = await fetch(
-          `http://localhost:5000/api/order/capture-order/${paymentId}`,
+          `${import.meta.env.VITE_BASE_URL}/order/capture-order/${paymentId}`,
           {
             method: "POST",
             headers: {
