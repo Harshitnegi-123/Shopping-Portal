@@ -31,7 +31,7 @@ export default function OrderSuccess() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Authentication required");
 
-        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/order/myorders`, {  // Reuse myorders endpoint
+        const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/order/myorders`, {  // Reuse myorders endpoint
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
