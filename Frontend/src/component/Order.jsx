@@ -149,7 +149,7 @@ export default function Orders() {
                       </div>
                     </div>
                     <div className="text-right mt-4 sm:mt-0">
-                      <p className="text-2xl font-bold text-green-600 mb-2">₹{order.amount || '0.00'}</p>
+                      <p className="text-2xl font-bold text-green-600 mb-2">${order.amount || '0.00'}</p>
                       <motion.span className="text-xs px-3 py-1 rounded-full font-medium bg-green-100 text-green-800" whileHover={{ scale: 1.05 }}>
                         {order.status || 'Completed'}
                       </motion.span>
@@ -168,7 +168,7 @@ export default function Orders() {
                               {item.name || item.title || `Item ${index + 1}`}
                               {item.quantity && item.quantity > 1 && <span className="text-gray-500 ml-2">× {item.quantity}</span>}
                             </span>
-                            <span className="text-gray-600 font-semibold">₹{item.price || '0.00'}</span>
+                            <span className="text-gray-600 font-semibold">${item.price || '0.00'}</span>
                           </motion.div>
                         ))}
                       </div>

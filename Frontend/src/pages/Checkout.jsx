@@ -148,14 +148,14 @@ export default function Checkout() {
                   <span className="font-medium">Subtotal</span>
                   <div className="text-right">
                     <span className="font-semibold block">${convertToUSD(cartFromState.total || 0)} USD</span>
-                    <span className="text-xs text-gray-500">₹{Number(cartFromState.total || 0).toFixed(2)}</span>
+                    <span className="text-xs text-gray-500">${Number(cartFromState.total || 0).toFixed(2)}</span>
                   </div>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
                   <span className="font-medium">Tax (5%)</span>
                   <div className="text-right">
                     <span className="font-semibold block">${convertToUSD((cartFromState.total || 0) * 0.05)} USD</span>
-                    <span className="text-xs text-gray-500">₹{Number((cartFromState.total || 0) * 0.05).toFixed(2)}</span>
+                    <span className="text-xs text-gray-500">${Number((cartFromState.total || 0) * 0.05).toFixed(2)}</span>
                   </div>
                 </div>
                 <div className="border-t-2 border-gray-200 my-4"></div>
@@ -163,7 +163,7 @@ export default function Checkout() {
                   <span className="font-bold text-lg">Total</span>
                   <div className="text-right">
                     <span className="text-2xl font-bold text-yellow-700 block">${totalAmountUSD} USD</span>
-                    <span className="text-sm text-yellow-600">₹{Number(totalAmount).toFixed(2)}</span>
+                    <span className="text-sm text-yellow-600">${Number(totalAmount).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

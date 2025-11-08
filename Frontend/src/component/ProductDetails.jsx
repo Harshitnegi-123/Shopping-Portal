@@ -106,7 +106,7 @@ export default function Productdetails() {
                                     <span className="text-lg line-through text-gray-400">${Math.round(product.price * 1.2)}</span>
                                     <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">20% OFF</span>
                                 </div>
-                                <p className="text-gray-600 text-sm mt-2">Free delivery on orders above ₹500</p>
+                                <p className="text-gray-600 text-sm mt-2">Free delivery on orders above $500</p>
                             </div>
 
                             {/* Quantity Selector */}
@@ -175,7 +175,7 @@ export default function Productdetails() {
                                 <div className="h-48 bg-gray-200"></div>
                                 <div className="p-4">
                                     <h3 className="font-semibold text-gray-900 mb-2">Related Product {item}</h3>
-                                    <p className="text-yellow-700 font-bold">₹299</p>
+                                    <p className="text-yellow-700 font-bold">$299</p>
                                 </div>
                             </div>
                         ))}

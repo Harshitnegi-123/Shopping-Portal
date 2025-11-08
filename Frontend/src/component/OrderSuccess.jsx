@@ -168,7 +168,7 @@ export default function OrderSuccess() {
                   ${orderDetails?.totalUSD} USD
                 </span>
                 <div className="text-sm text-gray-500 flex items-center gap-1">
-                  <FaExchangeAlt /> ₹{orderDetails?.total}
+                  <FaExchangeAlt /> ${orderDetails?.total}
                 </div>
               </div>
             </div>

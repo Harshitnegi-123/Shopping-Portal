@@ -307,7 +307,7 @@ function Cart() {
                                                     <p className="text-gray-600 text-sm mb-4">{item.productId.description}</p>
                                                     <div className="flex justify-between items-center">
                                                         <div className="text-2xl font-bold text-yellow-700">
-                                                            ₹{Number(item.productId.price || 0).toFixed(2)}
+                                                            ${Number(item.productId.price || 0).toFixed(2)}
                                                         </div>
 
                                                         <div className="flex items-center gap-4">
@@ -373,7 +373,7 @@ function Cart() {
                                     <div className="space-y-4 mb-6">
                                         <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
                                             <span className="font-medium text-gray-700">Subtotal</span>
-                                            <span className="font-semibold">₹{totalPrice.toFixed(2)}</span>
+                                            <span className="font-semibold">${totalPrice.toFixed(2)}</span>
                                         </div>
                                         <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
                                             <span className="font-medium text-gray-700 flex items-center gap-2">
@@ -384,12 +384,12 @@ function Cart() {
                                         </div>
                                         <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
                                             <span className="font-medium text-gray-700">Tax (5%)</span>
-                                            <span className="font-semibold">₹{(totalPrice * 0.05).toFixed(2)}</span>
+                                            <span className="font-semibold">${(totalPrice * 0.05).toFixed(2)}</span>
                                         </div>
                                         <div className="border-t-2 border-gray-200 pt-4">
                                             <div className="flex justify-between items-center p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl">
                                                 <span className="font-bold text-xl">Total</span>
-                                                <span className="text-2xl font-bold text-yellow-700">₹{(totalPrice + (totalPrice * 0.05)).toFixed(2)}</span>
+                                                <span className="text-2xl font-bold text-yellow-700">${(totalPrice + (totalPrice * 0.05)).toFixed(2)}</span>
                                             </div>
                                         </div>
                                     </div>

@@ -251,13 +251,27 @@ function FeaturedProductsCarousel({ products, onAddToCart, navigate }) {
     // Carousel
     return (
         <div className="relative overflow-hidden">
-            <motion.div
+            {/* <motion.div
                 className="flex transition-transform duration-500 ease-in-out"
                 style={{
                     transform: `translateX(-${currentIndex * (100 / totalPages)}%)`,
                     width: `${totalPages * 100}%`
                 }}
-                key={currentIndex} // Remount to avoid glitches
+                // key={currentIndex} // Remount to avoid glitches
+            > */}
+            <motion.div
+                className="flex"
+                animate={{
+                    x: `-${currentIndex * (100 / totalPages)}%`
+                }}
+                transition={{
+                    type: "spring",
+                    stiffness: 120,
+                    damping: 20
+                }}
+                style={{
+                    width: `${totalPages * 100}%`
+                }}
             >
                 {Array.from({ length: totalPages }).map((_, pageIdx) => (
                     <div key={pageIdx} className="flex w-full" style={{ width: `${100 / totalPages}%` }}>

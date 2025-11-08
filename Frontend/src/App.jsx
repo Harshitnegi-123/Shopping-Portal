@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import scrollToTop from './component/ScrollToTop'
 import Dashboard from './pages/Dashboard'
 import AuthPage from './pages/Authpage'
 import ProtectedRoute from './component/ProtectedRoute'
@@ -63,6 +64,7 @@ function AppContent() {
 function App() {
   return (
     <Router>
+      <scrollToTop />
       <AppContent />
     </Router>
   )

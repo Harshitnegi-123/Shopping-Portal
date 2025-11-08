@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { useState } from "react"
 import {
+    FaSignInAlt,
     FaHome,
     FaShoppingCart,
     FaUser,
@@ -198,10 +199,23 @@ function Navbar() {
                                                 setIsUserMenuOpen(false);
                                                 handleLogout();
                                             }}
-                                            className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 w-full text-left transition-all duration-200"
+                                            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 w-full text-left transition-all duration-200
+                                            ${localStorage.getItem("token")
+                                                ? " hover:bg-red-100 text-red-600 hover:text-white"
+                                                : " hover:bg-green-100 text-green-600 hover:text-white"}
+                                            `}
                                         >
-                                            <FaSignOutAlt className="text-lg" />
-                                            <span className="font-medium">Logout</span>
+
+                                            {/* <span className="font-medium">Logout</span> */}
+                                            {localStorage.getItem("token") ? (
+                                                <button className="flex items-center gap-2 text-red-600 hover:text-red-700 font-semibold">
+                                                    <FaSignOutAlt className="text-lg" />
+                                                    Logout</button>
+                                            ) : (
+
+                                                <button className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold" onClick={() => navigate("/")}>
+                                                    <FaSignInAlt className="text-lg flex" />Login</button>
+                                            )}
                                         </button>
                                     </div>
                                 </motion.div>
@@ -258,7 +272,7 @@ function Navbar() {
                                 <span className="font-medium">Orders</span>
                             </Link>
 
-                            <button
+                            {/* <button
                                 onClick={() => {
                                     setIsMenuOpen(false);
                                     handleLogout();
@@ -267,7 +281,25 @@ function Navbar() {
                             >
                                 <FaSignOutAlt className="text-lg" />
                                 <span className="font-medium">Logout</span>
-                            </button>
+                            </button> */}
+                            {isLoggedIn ? (
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center gap-2 text-red-600 hover:text-red-700 font-semibold"
+                                >
+                                    <FaSignOutAlt size={18} />
+                                    Logout
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => navigate("/")}
+                                    className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold"
+                                >
+                                    <FaSignInAlt size={18} />
+                                    Login
+                                </button>
+                            )}
+
                         </div>
                     </motion.div>
                 )}

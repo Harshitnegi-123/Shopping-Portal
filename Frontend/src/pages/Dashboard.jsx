@@ -359,7 +359,7 @@ const Dashboard = () => {
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600 text-sm">Avg Order Value</span>
                                             <span className="font-semibold text-gray-800">
-                                                {stats.totalOrders > 0 ? formatCurrency(stats.totalRevenue / stats.totalOrders) : '₹0'}
+                                                {stats.totalOrders > 0 ? formatCurrency(stats.totalRevenue / stats.totalOrders) : '$0'}
                                             </span>
                                         </div>
                                     </div>

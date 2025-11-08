@@ -165,7 +165,7 @@ const addTestData = async () => {
             { $group: { _id: null, total: { $sum: '$amount' } } }
         ]);
 
-        console.log(`Total Revenue: ₹${totalRevenue[0]?.total || 0}`);
+        console.log(`Total Revenue: $${totalRevenue[0]?.total || 0}`);
 
         console.log('\nTest data added successfully!');
         process.exit(0);
